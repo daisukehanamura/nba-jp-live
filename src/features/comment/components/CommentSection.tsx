@@ -23,7 +23,7 @@ export function CommentSection({
   currentUserId,
   currentUserProfile,
 }: CommentSectionProps) {
-  const { comments, bottomRef, addOptimistic } = useComments(gameId, initialComments)
+  const { comments, bottomRef, addOptimistic, confirmOptimistic } = useComments(gameId, initialComments)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -42,10 +42,10 @@ export function CommentSection({
     setError(null)
     setLoading(true)
 
-    // 楽観的更新: 即時表示
-    const optimisticId = crypto.randomUUID()
+    // 楽観的更新: 仮IDで即時表示
+    const tempId = crypto.randomUUID()
     addOptimistic({
-      id: optimisticId,
+      id: tempId,
       gameId,
       userId: currentUserId,
       content,
@@ -55,14 +55,19 @@ export function CommentSection({
 
     if (inputRef.current) inputRef.current.value = ''
 
-    // サーバーに送信
+    // DBに挿入して本物のIDを取得
     const supabase = createClient()
-    const { error: dbError } = await supabase
+    const { data, error: dbError } = await supabase
       .from('comments')
       .insert({ game_id: gameId, user_id: currentUserId, content })
+      .select('id')
+      .single()
 
-    if (dbError) {
+    if (dbError || !data) {
       setError('投稿に失敗しました。もう一度お試しください')
+    } else {
+      // 仮IDを本物のIDに差し替え（Realtimeの重複も防止）
+      confirmOptimistic(tempId, data.id)
     }
 
     setLoading(false)
@@ -74,20 +79,20 @@ export function CommentSection({
         コメント
       </h2>
       <CommentFeed comments={comments} bottomRef={bottomRef} />
-      <form onSubmit={handleSubmit} className="flex flex-col gap-1">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-1.5">
         <div className="flex gap-2">
           <input
             ref={inputRef}
             type="text"
             maxLength={200}
             placeholder="コメントを入力..."
-            className="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
             disabled={loading}
           />
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white rounded px-4 py-2 text-sm font-medium disabled:opacity-50 shrink-0"
+            className="bg-blue-600 text-white rounded-lg px-4 py-2.5 text-sm font-medium disabled:opacity-50 shrink-0 hover:bg-blue-700 transition-colors"
           >
             送信
           </button>

@@ -24,6 +24,33 @@ export async function getProfile(userId: string): Promise<Profile | null> {
   return result.success ? result.data : null
 }
 
+export async function updateProfile(
+  userId: string,
+  displayName: string
+): Promise<Profile | null> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ display_name: displayName })
+    .eq('id', userId)
+    .select()
+    .single()
+
+  if (error || !data) return null
+
+  const result = ProfileSchema.safeParse({
+    id: data.id,
+    username: data.username,
+    displayName: data.display_name,
+    avatarUrl: data.avatar_url,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+  })
+
+  return result.success ? result.data : null
+}
+
 export async function createProfile(
   userId: string,
   username: string,

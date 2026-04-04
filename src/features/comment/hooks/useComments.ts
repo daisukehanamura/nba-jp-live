@@ -7,15 +7,12 @@ import { CommentSchema, type Comment } from '../schema'
 export function useComments(gameId: string, initialComments: Comment[]) {
   const [comments, setComments] = useState<Comment[]>(initialComments)
   const bottomRef = useRef<HTMLDivElement | null>(null)
-  // Realtime で受信済みのIDを追跡（オプティミスティック重複防止）
   const receivedIds = useRef<Set<string>>(new Set(initialComments.map((c) => c.id)))
 
-  // コメントが増えたら最下部にスクロール
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [comments.length])
 
-  // Supabase Realtime 購読
   useEffect(() => {
     const supabase = createClient()
 
@@ -32,7 +29,7 @@ export function useComments(gameId: string, initialComments: Comment[]) {
         async (payload) => {
           const id = payload.new['id'] as string
 
-          // すでに楽観的に追加済みのコメントは無視
+          // 自分の投稿（楽観的更新済み or 既受信）はスキップ
           if (receivedIds.current.has(id)) return
           receivedIds.current.add(id)
 
@@ -69,11 +66,18 @@ export function useComments(gameId: string, initialComments: Comment[]) {
     }
   }, [gameId])
 
-  // 楽観的にコメントを追加する関数
+  // 楽観的にコメントを追加し、後で本物のIDに差し替えられるよう仮IDを返す
   function addOptimistic(comment: Comment) {
-    receivedIds.current.add(comment.id)
     setComments((prev) => [...prev, comment])
   }
 
-  return { comments, bottomRef, addOptimistic }
+  // 楽観的コメント（仮ID）を本物のIDに差し替える
+  function confirmOptimistic(tempId: string, realId: string) {
+    receivedIds.current.add(realId) // Realtimeで重複しないようにマーク
+    setComments((prev) =>
+      prev.map((c) => (c.id === tempId ? { ...c, id: realId } : c))
+    )
+  }
+
+  return { comments, bottomRef, addOptimistic, confirmOptimistic }
 }
