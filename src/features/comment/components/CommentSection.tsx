@@ -23,7 +23,15 @@ export function CommentSection({
   currentUserId,
   currentUserProfile,
 }: CommentSectionProps) {
-  const { comments, bottomRef, addOptimistic, confirmOptimistic } = useComments(gameId, initialComments)
+  const {
+    comments,
+    unreadCount,
+    scrollContainerRef,
+    bottomRef,
+    scrollToLatest,
+    addOptimistic,
+    confirmOptimistic,
+  } = useComments(gameId, initialComments)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -42,7 +50,6 @@ export function CommentSection({
     setError(null)
     setLoading(true)
 
-    // 楽観的更新: 仮IDで即時表示
     const tempId = crypto.randomUUID()
     addOptimistic({
       id: tempId,
@@ -55,7 +62,6 @@ export function CommentSection({
 
     if (inputRef.current) inputRef.current.value = ''
 
-    // DBに挿入して本物のIDを取得
     const supabase = createClient()
     const { data, error: dbError } = await supabase
       .from('comments')
@@ -66,7 +72,6 @@ export function CommentSection({
     if (dbError || !data) {
       setError('投稿に失敗しました。もう一度お試しください')
     } else {
-      // 仮IDを本物のIDに差し替え（Realtimeの重複も防止）
       confirmOptimistic(tempId, data.id)
     }
 
@@ -75,10 +80,26 @@ export function CommentSection({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+      <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
         コメント
       </h2>
-      <CommentFeed comments={comments} bottomRef={bottomRef} />
+
+      <div className="relative">
+        <CommentFeed
+          comments={comments}
+          scrollContainerRef={scrollContainerRef}
+          bottomRef={bottomRef}
+        />
+        {unreadCount > 0 && (
+          <button
+            onClick={scrollToLatest}
+            className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs rounded-full px-4 py-1.5 shadow-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+          >
+            ↓ {unreadCount}件の新しいコメント
+          </button>
+        )}
+      </div>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-1.5">
         <div className="flex gap-2">
           <input

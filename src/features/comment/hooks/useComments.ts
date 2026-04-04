@@ -4,15 +4,41 @@ import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { CommentSchema, type Comment } from '../schema'
 
+const SCROLL_THRESHOLD = 80 // px from bottom to consider "at bottom"
+
 export function useComments(gameId: string, initialComments: Comment[]) {
   const [comments, setComments] = useState<Comment[]>(initialComments)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const receivedIds = useRef<Set<string>>(new Set(initialComments.map((c) => c.id)))
+  const isAtBottomRef = useRef(true)
 
+  // スクロール位置を監視
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    function handleScroll() {
+      const { scrollTop, scrollHeight, clientHeight } = container!
+      isAtBottomRef.current = scrollHeight - scrollTop - clientHeight < SCROLL_THRESHOLD
+      if (isAtBottomRef.current) {
+        setUnreadCount(0)
+      }
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // 最下部にいるときだけ自動スクロール
+  useEffect(() => {
+    if (isAtBottomRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [comments.length])
 
+  // Realtime購読
   useEffect(() => {
     const supabase = createClient()
 
@@ -29,7 +55,6 @@ export function useComments(gameId: string, initialComments: Comment[]) {
         async (payload) => {
           const id = payload.new['id'] as string
 
-          // 自分の投稿（楽観的更新済み or 既受信）はスキップ
           if (receivedIds.current.has(id)) return
           receivedIds.current.add(id)
 
@@ -56,6 +81,9 @@ export function useComments(gameId: string, initialComments: Comment[]) {
 
           if (result.success) {
             setComments((prev) => [...prev, result.data])
+            if (!isAtBottomRef.current) {
+              setUnreadCount((n) => n + 1)
+            }
           }
         }
       )
@@ -66,18 +94,30 @@ export function useComments(gameId: string, initialComments: Comment[]) {
     }
   }, [gameId])
 
-  // 楽観的にコメントを追加し、後で本物のIDに差し替えられるよう仮IDを返す
+  function scrollToLatest() {
+    isAtBottomRef.current = true
+    setUnreadCount(0)
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   function addOptimistic(comment: Comment) {
     setComments((prev) => [...prev, comment])
   }
 
-  // 楽観的コメント（仮ID）を本物のIDに差し替える
   function confirmOptimistic(tempId: string, realId: string) {
-    receivedIds.current.add(realId) // Realtimeで重複しないようにマーク
+    receivedIds.current.add(realId)
     setComments((prev) =>
       prev.map((c) => (c.id === tempId ? { ...c, id: realId } : c))
     )
   }
 
-  return { comments, bottomRef, addOptimistic, confirmOptimistic }
+  return {
+    comments,
+    unreadCount,
+    scrollContainerRef,
+    bottomRef,
+    scrollToLatest,
+    addOptimistic,
+    confirmOptimistic,
+  }
 }
