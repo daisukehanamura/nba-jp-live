@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation'
 import { getGameById } from '@/features/game/repository'
 import { getComments } from '@/features/comment/repository'
+import { getProfile } from '@/features/auth/repository'
 import { GameStatusBadge } from '@/features/game/components/GameStatusBadge'
-import { CommentFeed } from '@/features/comment/components/CommentFeed'
-import { CommentForm } from '@/features/comment/components/CommentForm'
+import { CommentSection } from '@/features/comment/components/CommentSection'
+import { createClient } from '@/lib/supabase/server'
 
 interface GamePageProps {
   params: Promise<{ id: string }>
@@ -11,9 +12,14 @@ interface GamePageProps {
 
 export default async function GamePage({ params }: GamePageProps) {
   const { id } = await params
-  const [game, initialComments] = await Promise.all([
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const [game, initialComments, profile] = await Promise.all([
     getGameById(id),
     getComments(id),
+    user ? getProfile(user.id) : null,
   ])
 
   if (!game) notFound()
@@ -53,12 +59,27 @@ export default async function GamePage({ params }: GamePageProps) {
       </div>
 
       {/* コメントセクション */}
-      <div className="border-t pt-6 flex flex-col gap-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-          コメント
-        </h2>
-        <CommentFeed gameId={game.id} initialComments={initialComments} />
-        <CommentForm gameId={game.id} />
+      <div className="border-t pt-6">
+        {user && profile ? (
+          <CommentSection
+            gameId={game.id}
+            initialComments={initialComments}
+            currentUserId={user.id}
+            currentUserProfile={{
+              username: profile.username,
+              displayName: profile.displayName,
+              avatarUrl: profile.avatarUrl,
+            }}
+          />
+        ) : (
+          <p className="text-center text-sm text-gray-400 py-8">
+            コメントするには
+            <a href="/auth/login" className="text-blue-600 hover:underline mx-1">
+              ログイン
+            </a>
+            が必要です
+          </p>
+        )}
       </div>
     </main>
   )

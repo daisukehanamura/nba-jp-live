@@ -1,16 +1,14 @@
 'use client'
 
-import { useComments } from '../hooks/useComments'
+import type { RefObject } from 'react'
 import type { Comment } from '../schema'
 
 interface CommentFeedProps {
-  gameId: string
-  initialComments: Comment[]
+  comments: Comment[]
+  bottomRef: RefObject<HTMLDivElement | null>
 }
 
-export function CommentFeed({ gameId, initialComments }: CommentFeedProps) {
-  const { comments, bottomRef } = useComments(gameId, initialComments)
-
+export function CommentFeed({ comments, bottomRef }: CommentFeedProps) {
   if (comments.length === 0) {
     return (
       <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
