@@ -19,15 +19,39 @@ NBA日本語リアルタイムコメントアプリ。日本語NBAファンが�
 - import alias: `@/*`
 - ビルド確認済み（`npm run build` 成功）
 
-### ⬜ ステップ2: CLAUDE.md 作成
+### ✅ ステップ2: CLAUDE.md 作成
 
-### ⬜ ステップ3: フォルダ構成の設計（feature-based）
+- `CLAUDE.md` をプロジェクトルートに作成
+- 技術スタック・ディレクトリ構成・コーディング原則・セキュリティ方針を記載
 
-### ⬜ ステップ4: `.env.local.example` の作成
+### ✅ ステップ3: フォルダ構成の設計（feature-based）
 
-### ⬜ ステップ5: ESLint・TypeScript設定の強化（Zod インストール含む）
+- `src/features/{game,comment,quote-card,auth}/` を作成（各feature内に `components/`, `hooks/`）
+- `src/{components,hooks,lib,types,utils}/` を作成
+- `src/lib/{supabase,x-api,reddit}/` を作成
+- `supabase/migrations/` を作成
+- 空ディレクトリには `.gitkeep` を配置
 
-### ⬜ ステップ6: Supabase DB設計（スキーマ・マイグレーション）
+### ✅ ステップ4: `.env.local.example` の作成
+
+- Supabase / X API / Reddit API / App URL の環境変数テンプレートを作成
+- `.gitignore` に `!.env.local.example` を追加（テンプレートはコミット対象に）
+
+### ✅ ステップ5: ESLint・TypeScript設定の強化（Zod インストール含む）
+
+- `zod@4.3.6` インストール済み
+- `tsconfig.json` に厳格オプション追加: `noUncheckedIndexedAccess`, `noImplicitReturns`, `noFallthroughCasesInSwitch`
+- `eslint.config.mjs` にルール追加: `no-explicit-any: error`, `no-console: error`, `no-unused-vars: error`
+- ビルド確認済み
+
+### ✅ ステップ6: Supabase DB設計（スキーマ・マイグレーション）
+
+- `supabase/migrations/20260404000000_initial_schema.sql` を作成
+- テーブル: `profiles`, `games`, `comments`, `quote_cards`
+- ENUM: `game_status` (scheduled/live/final), `quote_source` (x/reddit)
+- インデックス: コメント・quote_cards の game_id+時系列、試合のstatus+日時
+- `updated_at` 自動更新トリガー（profiles, games）
+- RLS: 全テーブルに設定（読み取り全員可、書き込みは認証済みユーザー・サービスロールのみ）
 
 ### ⬜ ステップ7: GitHubリポジトリ作成・Vercel連携
 
