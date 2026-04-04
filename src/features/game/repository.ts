@@ -10,6 +10,8 @@ function parseGame(row: Record<string, unknown>): Game | null {
     homeScore: row.home_score,
     awayScore: row.away_score,
     status: row.status,
+    period: row.period ?? 0,
+    gameTime: row.game_time ?? '',
     scheduledAt: row.scheduled_at,
     startedAt: row.started_at,
     endedAt: row.ended_at,

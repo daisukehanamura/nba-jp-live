@@ -10,6 +10,8 @@ export const GameSchema = z.object({
   homeScore: z.number().int().nullable(),
   awayScore: z.number().int().nullable(),
   status: GameStatusSchema,
+  period: z.number().int().default(0),
+  gameTime: z.string().default(''),
   scheduledAt: z.string(),
   startedAt: z.string().nullable(),
   endedAt: z.string().nullable(),

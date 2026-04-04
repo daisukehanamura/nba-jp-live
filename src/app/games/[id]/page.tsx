@@ -53,7 +53,7 @@ export default async function GamePage({ params }: GamePageProps) {
       {/* 試合カード */}
       <div className="bg-white rounded-2xl border border-gray-200 px-6 py-6 shadow-sm">
         <div className="flex items-center gap-3 mb-5">
-          <GameStatusBadge status={game.status} />
+          <GameStatusBadge status={game.status} period={game.period} gameTime={game.gameTime} />
           <span className="text-sm text-gray-600">{time} JST</span>
         </div>
 

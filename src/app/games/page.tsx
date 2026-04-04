@@ -1,6 +1,7 @@
 import { getGamesByDate } from '@/features/game/repository'
 import { GameCard } from '@/features/game/components/GameCard'
 import { DateNav } from '@/features/game/components/DateNav'
+import { LiveRefresh } from '@/features/game/components/LiveRefresh'
 
 interface GamesPageProps {
   searchParams: Promise<{ date?: string }>
@@ -19,6 +20,7 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-6">
+      <LiveRefresh hasLiveGames={liveGames.length > 0} />
       <h1 className="text-xl font-bold mb-4">NBA 試合</h1>
 
       <div className="mb-6">

@@ -21,12 +21,14 @@ function toDbGame(game: BallDontLieGame) {
   const scheduledAt = parseScheduledAt(game.date, game.status)
   return {
     external_id: String(game.id),
-    game_date: game.date,           // NBAのET基準日付 (YYYY-MM-DD)
+    game_date: game.date,
     home_team: game.home_team.full_name,
     away_team: game.visitor_team.full_name,
     home_score: status !== 'scheduled' ? game.home_team_score : null,
     away_score: status !== 'scheduled' ? game.visitor_team_score : null,
     status,
+    period: game.period,
+    game_time: game.time ?? '',
     scheduled_at: scheduledAt,
     started_at: status !== 'scheduled' ? scheduledAt : null,
     ended_at: status === 'final' ? scheduledAt : null,
@@ -47,6 +49,17 @@ export async function syncGames(startDate: string, endDate: string) {
   if (error) throw new Error(`Supabase upsert error: ${error.message}`)
 
   return { synced: games.length }
+}
+
+// 今日・昨日の試合のみ同期（ライブスコア更新用）
+export async function syncLiveGames() {
+  const now = new Date()
+  const today = now.toISOString().split('T')[0]!
+  const yesterday = new Date(now)
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayStr = yesterday.toISOString().split('T')[0]!
+
+  return syncGames(yesterdayStr, today)
 }
 
 export function getDefaultDateRange() {
