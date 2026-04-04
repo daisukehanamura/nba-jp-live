@@ -24,8 +24,8 @@ export const ProfileSchema = z.object({
   username: z.string(),
   displayName: z.string(),
   avatarUrl: z.string().url().nullable(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 })
 
 export type SignUpInput = z.infer<typeof SignUpSchema>
