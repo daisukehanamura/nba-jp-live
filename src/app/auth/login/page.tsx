@@ -8,12 +8,12 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <p className="text-3xl mb-2">🏀</p>
           <h1 className="text-2xl font-bold">ログイン</h1>
-          <p className="text-sm text-gray-400 mt-1">Courtside JP へようこそ</p>
+          <p className="text-sm text-gray-600 mt-1">Courtside JP へようこそ</p>
         </div>
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
           <LoginForm />
         </div>
-        <p className="mt-4 text-sm text-center text-gray-400">
+        <p className="mt-4 text-sm text-center text-gray-600">
           アカウントをお持ちでない方は{' '}
           <Link href="/auth/signup" className="text-blue-500 hover:underline font-medium">
             新規登録

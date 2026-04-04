@@ -40,7 +40,7 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
 
       {scheduledGames.length > 0 && (
         <section className="mb-6">
-          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+          <h2 className="text-xs font-bold text-gray-600 uppercase tracking-widest mb-3">
             予定
           </h2>
           <ul className="flex flex-col gap-3">
@@ -53,7 +53,7 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
 
       {finalGames.length > 0 && (
         <section className="mb-6">
-          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+          <h2 className="text-xs font-bold text-gray-600 uppercase tracking-widest mb-3">
             終了
           </h2>
           <ul className="flex flex-col gap-3">
@@ -65,7 +65,7 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
       )}
 
       {games.length === 0 && (
-        <div className="text-center py-20 text-gray-400">
+        <div className="text-center py-20 text-gray-600">
           <p className="text-4xl mb-3">🏀</p>
           <p className="text-sm">この日の試合はありません</p>
         </div>

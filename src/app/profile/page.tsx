@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getProfile } from '@/features/auth/repository'
-import { getComments } from '@/features/comment/repository'
 import { ProfileEditForm } from '@/features/auth/components/ProfileEditForm'
 import { LogoutButton } from '@/features/auth/components/LogoutButton'
 
@@ -14,7 +13,6 @@ export default async function ProfilePage() {
   const profile = await getProfile(user.id)
   if (!profile) redirect('/auth/login')
 
-  // 直近20件のコメントを取得（全ゲーム横断）
   const { data: recentComments } = await supabase
     .from('comments')
     .select('*, games(home_team, away_team, scheduled_at)')
@@ -37,9 +35,9 @@ export default async function ProfilePage() {
             {profile.displayName.charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="font-bold text-lg">{profile.displayName}</p>
-            <p className="text-sm text-gray-400">@{profile.username}</p>
-            <p className="text-xs text-gray-300 mt-0.5">{joinedAt} 登録</p>
+            <p className="font-bold text-lg text-gray-900">{profile.displayName}</p>
+            <p className="text-sm text-gray-600">@{profile.username}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{joinedAt} 登録</p>
           </div>
         </div>
 
@@ -48,22 +46,22 @@ export default async function ProfilePage() {
 
       {/* 最近のコメント */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
-        <h2 className="font-semibold text-sm text-gray-500 uppercase tracking-wide mb-4">
+        <h2 className="font-semibold text-sm text-gray-700 uppercase tracking-wide mb-4">
           最近のコメント
         </h2>
         {recentComments && recentComments.length > 0 ? (
-          <ul className="flex flex-col gap-3">
+          <ul className="flex flex-col gap-4">
             {recentComments.map((c) => {
               const game = c.games as { home_team: string; away_team: string; scheduled_at: string } | null
               return (
-                <li key={c.id} className="text-sm">
+                <li key={c.id} className="text-sm border-b border-gray-100 pb-3 last:border-0 last:pb-0">
                   {game && (
-                    <p className="text-xs text-gray-400 mb-0.5">
+                    <p className="text-xs text-gray-600 font-medium mb-0.5">
                       {game.away_team} vs {game.home_team}
                     </p>
                   )}
-                  <p className="text-gray-700">{c.content}</p>
-                  <p className="text-xs text-gray-300 mt-0.5">
+                  <p className="text-gray-800">{c.content}</p>
+                  <p className="text-xs text-gray-500 mt-1">
                     {new Date(c.created_at).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
                   </p>
                 </li>
@@ -71,17 +69,17 @@ export default async function ProfilePage() {
             })}
           </ul>
         ) : (
-          <p className="text-sm text-gray-400">まだコメントがありません</p>
+          <p className="text-sm text-gray-600">まだコメントがありません</p>
         )}
       </div>
 
-      {/* ログアウト */}
+      {/* アカウント */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-        <h2 className="font-semibold text-sm text-gray-500 uppercase tracking-wide mb-4">
+        <h2 className="font-semibold text-sm text-gray-700 uppercase tracking-wide mb-4">
           アカウント
         </h2>
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600">{user.email}</p>
+          <p className="text-sm text-gray-700">{user.email}</p>
           <LogoutButton />
         </div>
       </div>

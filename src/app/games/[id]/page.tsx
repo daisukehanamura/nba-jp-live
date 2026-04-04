@@ -6,6 +6,8 @@ import { getProfile } from '@/features/auth/repository'
 import { GameStatusBadge } from '@/features/game/components/GameStatusBadge'
 import { TeamDisplay } from '@/features/game/components/TeamDisplay'
 import { CommentSection } from '@/features/comment/components/CommentSection'
+import { PredictionPanel } from '@/features/prediction/components/PredictionPanel'
+import { getPredictionSummary } from '@/features/prediction/repository'
 import { createClient } from '@/lib/supabase/server'
 
 interface GamePageProps {
@@ -25,6 +27,8 @@ export default async function GamePage({ params }: GamePageProps) {
   ])
 
   if (!game) notFound()
+
+  const predictionSummary = await getPredictionSummary(game.id, user?.id ?? null)
 
   const dateStr = new Date(game.scheduledAt).toISOString().split('T')[0]
   const time = new Date(game.scheduledAt).toLocaleTimeString('ja-JP', {
@@ -50,18 +54,28 @@ export default async function GamePage({ params }: GamePageProps) {
       <div className="bg-white rounded-2xl border border-gray-200 px-6 py-6 mb-4 shadow-sm">
         <div className="flex items-center gap-3 mb-5">
           <GameStatusBadge status={game.status} />
-          <span className="text-sm text-gray-400">{time} JST</span>
+          <span className="text-sm text-gray-600">{time} JST</span>
         </div>
 
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
           <TeamDisplay teamName={game.awayTeam} score={game.awayScore} isWinner={awayWins} size="lg" />
           <div className="flex flex-col items-center gap-1 pb-6">
             <span className="text-gray-200 font-bold text-3xl">–</span>
-            <span className="text-xs text-gray-400">AWAY / HOME</span>
+            <span className="text-xs text-gray-500">AWAY / HOME</span>
           </div>
           <TeamDisplay teamName={game.homeTeam} score={game.homeScore} isWinner={homeWins} size="lg" />
         </div>
       </div>
+
+      {/* 勝利予測 */}
+      <PredictionPanel
+        gameId={game.id}
+        homeTeam={game.homeTeam}
+        awayTeam={game.awayTeam}
+        gameStatus={game.status}
+        initialSummary={predictionSummary}
+        isLoggedIn={!!user}
+      />
 
       {/* コメントセクション */}
       <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
@@ -77,7 +91,7 @@ export default async function GamePage({ params }: GamePageProps) {
             }}
           />
         ) : (
-          <p className="text-center text-sm text-gray-400 py-10">
+          <p className="text-center text-sm text-gray-600 py-10">
             コメントするには{' '}
             <Link href="/auth/login" className="text-blue-500 hover:underline font-medium">
               ログイン

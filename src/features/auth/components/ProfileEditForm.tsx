@@ -37,7 +37,7 @@ export function ProfileEditForm({ currentDisplayName }: ProfileEditFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">表示名</label>
+        <label className="block text-sm font-semibold text-gray-800 mb-1">表示名</label>
         <input
           type="text"
           value={displayName}

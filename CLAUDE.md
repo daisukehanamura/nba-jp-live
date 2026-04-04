@@ -238,6 +238,40 @@ type ApiResponse<T> = {
 
 ---
 
+## UIデザイン原則
+
+### テキストカラー階層（厳守）
+
+白・薄グレー背景上では以下を守る。**`text-gray-400` 以上に薄いものを本文・ラベルに使ってはならない。**
+
+| 用途 | クラス | 使用例 |
+|---|---|---|
+| メインテキスト | `text-gray-900` | 見出し・本文・名前 |
+| サブテキスト | `text-gray-600` | ラベル・説明文・メタ情報 |
+| 補足テキスト | `text-gray-400` | タイムスタンプ・プレースホルダー・カウンター |
+| 使用禁止（本文に） | `text-gray-300` 以下 | disabled状態のみ許可 |
+
+### NG例
+```tsx
+// ❌ ラベルにgray-400は薄すぎる
+<label className="text-gray-400">表示名</label>
+
+// ✅ ラベルはgray-600以上
+<label className="text-gray-600 font-medium">表示名</label>
+
+// ❌ 本文にgray-300は読めない
+<p className="text-gray-300">@username</p>
+
+// ✅
+<p className="text-gray-500">@username</p>
+```
+
+### ダークヘッダー上では
+- メインテキスト: `text-white`
+- サブテキスト: `text-gray-300`
+
+---
+
 ## TDD（テスト駆動開発）
 
 ### 基本サイクル
