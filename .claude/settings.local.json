@@ -3,7 +3,9 @@
     "allow": [
       "WebFetch(domain:claude.ai)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(npm install:*)",
+      "Bash(npm test:*)"
     ]
   }
 }
