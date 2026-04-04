@@ -1,5 +1,6 @@
+import { unstable_cache } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { GameSchema, type Game, type GameStatus } from './schema'
+import { GameSchema, type Game } from './schema'
 
 function parseGame(row: Record<string, unknown>): Game | null {
   const result = GameSchema.safeParse({
@@ -21,7 +22,7 @@ function parseGame(row: Record<string, unknown>): Game | null {
   return result.success ? result.data : null
 }
 
-export async function getGamesByDate(date: string): Promise<Game[]> {
+async function fetchGamesByDate(date: string): Promise<Game[]> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -38,7 +39,14 @@ export async function getGamesByDate(date: string): Promise<Game[]> {
   })
 }
 
-export async function getGameById(id: string): Promise<Game | null> {
+// 30秒キャッシュ（sync-liveが5分ごとに更新するため十分な鮮度）
+export const getGamesByDate = unstable_cache(
+  fetchGamesByDate,
+  ['games-by-date'],
+  { revalidate: 30, tags: ['games'] }
+)
+
+async function fetchGameById(id: string): Promise<Game | null> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -51,3 +59,10 @@ export async function getGameById(id: string): Promise<Game | null> {
 
   return parseGame(data as Record<string, unknown>)
 }
+
+// 試合詳細は30秒キャッシュ
+export const getGameById = unstable_cache(
+  fetchGameById,
+  ['game-by-id'],
+  { revalidate: 30, tags: ['games'] }
+)
