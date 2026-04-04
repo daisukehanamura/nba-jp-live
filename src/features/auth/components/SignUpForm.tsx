@@ -57,7 +57,7 @@ export function SignUpForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
           メールアドレス
         </label>
         <input
@@ -70,7 +70,7 @@ export function SignUpForm() {
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium mb-1">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
           パスワード（8文字以上）
         </label>
         <input
@@ -83,7 +83,7 @@ export function SignUpForm() {
         />
       </div>
       <div>
-        <label htmlFor="username" className="block text-sm font-medium mb-1">
+        <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
           ユーザー名（英数字・アンダースコア、3〜20文字）
         </label>
         <input
@@ -96,7 +96,7 @@ export function SignUpForm() {
         />
       </div>
       <div>
-        <label htmlFor="displayName" className="block text-sm font-medium mb-1">
+        <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">
           表示名
         </label>
         <input

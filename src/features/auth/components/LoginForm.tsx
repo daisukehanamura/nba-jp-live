@@ -44,7 +44,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
           メールアドレス
         </label>
         <input
@@ -57,7 +57,7 @@ export function LoginForm() {
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium mb-1">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
           パスワード
         </label>
         <input
