@@ -39,13 +39,29 @@ export async function syncGames(startDate: string, endDate: string) {
   return { synced: games.length }
 }
 
-// 過去6ヶ月〜未来1ヶ月を同期
+// 毎日の差分更新用: 昨日〜未来2週間
 export function getDefaultDateRange() {
   const now = new Date()
   const start = new Date(now)
-  start.setMonth(start.getMonth() - 6)
+  start.setDate(start.getDate() - 1)
   const end = new Date(now)
+  end.setDate(end.getDate() + 14)
+
+  return {
+    startDate: start.toISOString().split('T')[0]!,
+    endDate: end.toISOString().split('T')[0]!,
+  }
+}
+
+// 初回の過去データ一括取得用（月単位で分割して呼ぶ想定）
+export function getHistoricalDateRange(monthsAgo: number) {
+  const now = new Date()
+  const start = new Date(now)
+  start.setMonth(start.getMonth() - monthsAgo)
+  start.setDate(1)
+  const end = new Date(start)
   end.setMonth(end.getMonth() + 1)
+  end.setDate(0) // 月末
 
   return {
     startDate: start.toISOString().split('T')[0]!,

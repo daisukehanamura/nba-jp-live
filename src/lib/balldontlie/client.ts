@@ -23,6 +23,10 @@ interface GamesResponse {
   meta: { next_cursor?: number; per_page: number }
 }
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 export async function fetchGames(params: {
   start_date: string  // YYYY-MM-DD
   end_date: string
@@ -47,8 +51,9 @@ export async function fetchGames(params: {
 
   const json = await res.json() as GamesResponse
 
-  // ページネーション: 次のカーソルがあれば再帰取得
+  // ページネーション: 次のカーソルがあれば1秒待ってから取得（レートリミット対策）
   if (json.meta.next_cursor) {
+    await sleep(1000)
     const next = await fetchGames({ ...params, cursor: json.meta.next_cursor })
     return [...json.data, ...next]
   }
