@@ -1,5 +1,5 @@
 import { unstable_cache } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { GameSchema, type Game } from './schema'
 
 function parseGame(row: Record<string, unknown>): Game | null {
@@ -23,7 +23,7 @@ function parseGame(row: Record<string, unknown>): Game | null {
 }
 
 async function fetchGamesByDate(date: string): Promise<Game[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from('games')
@@ -47,7 +47,7 @@ export const getGamesByDate = unstable_cache(
 )
 
 async function fetchGameById(id: string): Promise<Game | null> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from('games')
