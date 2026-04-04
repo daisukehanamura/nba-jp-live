@@ -24,6 +24,7 @@ export const ProfileSchema = z.object({
   username: z.string(),
   displayName: z.string(),
   avatarUrl: z.string().url().nullable(),
+  points: z.number().int().default(0),
   createdAt: z.string(),
   updatedAt: z.string(),
 })

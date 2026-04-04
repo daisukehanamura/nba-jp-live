@@ -42,16 +42,16 @@ export default async function GamePage({ params }: GamePageProps) {
   const homeWins = hasScore && game.homeScore! > game.awayScore!
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-6">
+    <main className="max-w-3xl mx-auto px-4 py-6 flex flex-col gap-4">
       <Link
         href={`/games?date=${dateStr}`}
-        className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 mb-4"
+        className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 -mb-2"
       >
         ← 試合一覧に戻る
       </Link>
 
       {/* 試合カード */}
-      <div className="bg-white rounded-2xl border border-gray-200 px-6 py-6 mb-4 shadow-sm">
+      <div className="bg-white rounded-2xl border border-gray-200 px-6 py-6 shadow-sm">
         <div className="flex items-center gap-3 mb-5">
           <GameStatusBadge status={game.status} />
           <span className="text-sm text-gray-600">{time} JST</span>
@@ -78,7 +78,7 @@ export default async function GamePage({ params }: GamePageProps) {
       />
 
       {/* コメントセクション */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm mb-4">
         {user && profile ? (
           <CommentSection
             gameId={game.id}

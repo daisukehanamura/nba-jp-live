@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/sync-games",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/settle-predictions",
+      "schedule": "0 * * * *"
     }
   ]
 }

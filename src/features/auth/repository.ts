@@ -17,6 +17,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
     username: data.username,
     displayName: data.display_name,
     avatarUrl: data.avatar_url,
+    points: data.points ?? 0,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
   })
@@ -44,6 +45,7 @@ export async function updateProfile(
     username: data.username,
     displayName: data.display_name,
     avatarUrl: data.avatar_url,
+    points: data.points ?? 0,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
   })
@@ -71,6 +73,7 @@ export async function createProfile(
     username: data.username,
     displayName: data.display_name,
     avatarUrl: data.avatar_url,
+    points: data.points ?? 0,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
   })

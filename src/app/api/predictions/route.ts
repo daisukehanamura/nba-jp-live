@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { PostPredictionSchema } from '@/features/prediction/schema'
+import { PostPredictionSchema, calcOdds } from '@/features/prediction/schema'
 import { ok, err } from '@/types/api'
 
 export async function POST(req: Request) {
@@ -18,17 +18,30 @@ export async function POST(req: Request) {
 
   const { gameId, predictedWinner } = validation.data
 
+  // 現在の投票数を取得してオッズ計算
+  const { data: existing } = await supabase
+    .from('predictions')
+    .select('predicted_winner')
+    .eq('game_id', gameId)
+
+  const rows = existing ?? []
+  const homeCount = rows.filter((r) => r.predicted_winner === 'home').length
+  const awayCount = rows.filter((r) => r.predicted_winner === 'away').length
+  const total = homeCount + awayCount
+
+  const chosenAfter = predictedWinner === 'home' ? homeCount + 1 : awayCount + 1
+  const odds = calcOdds(total + 1, chosenAfter)
+
   const { error: dbError } = await supabase
     .from('predictions')
-    .insert({ game_id: gameId, user_id: user.id, predicted_winner: predictedWinner })
+    .insert({ game_id: gameId, user_id: user.id, predicted_winner: predictedWinner, odds })
 
   if (dbError) {
-    // unique violation = already voted
     if (dbError.code === '23505') {
       return Response.json(err('すでに予測済みです'), { status: 409 })
     }
     return Response.json(err('投稿に失敗しました'), { status: 500 })
   }
 
-  return Response.json(ok(null), { status: 201 })
+  return Response.json(ok({ odds }), { status: 201 })
 }
