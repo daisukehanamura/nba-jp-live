@@ -19,19 +19,19 @@ function parseGame(row: Record<string, unknown>): Game | null {
   return result.success ? result.data : null
 }
 
-export async function getGames(status?: GameStatus): Promise<Game[]> {
+export async function getGamesByDate(date: string): Promise<Game[]> {
   const supabase = await createClient()
 
-  let query = supabase
+  // NBA の試合は ET（UTC-4〜UTC-5）なので日付範囲を広めに取る
+  const start = `${date}T00:00:00.000Z`
+  const end = `${date}T23:59:59.999Z`
+
+  const { data, error } = await supabase
     .from('games')
     .select('*')
-    .order('scheduled_at', { ascending: false })
-
-  if (status) {
-    query = query.eq('status', status)
-  }
-
-  const { data, error } = await query
+    .gte('scheduled_at', start)
+    .lte('scheduled_at', end)
+    .order('scheduled_at', { ascending: true })
 
   if (error || !data) return []
 
