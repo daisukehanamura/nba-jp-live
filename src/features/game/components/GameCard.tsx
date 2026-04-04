@@ -1,41 +1,35 @@
 import Link from 'next/link'
 import type { Game } from '../schema'
 import { GameStatusBadge } from './GameStatusBadge'
+import { TeamDisplay } from './TeamDisplay'
 
 interface GameCardProps {
   game: Game
 }
 
 export function GameCard({ game }: GameCardProps) {
-  const scheduledDate = new Date(game.scheduledAt).toLocaleString('ja-JP', {
-    month: 'long',
-    day: 'numeric',
+  const time = new Date(game.scheduledAt).toLocaleTimeString('ja-JP', {
     hour: '2-digit',
     minute: '2-digit',
     timeZone: 'Asia/Tokyo',
   })
 
+  const hasScore = game.homeScore !== null && game.awayScore !== null
+  const awayWins = hasScore && game.awayScore! > game.homeScore!
+  const homeWins = hasScore && game.homeScore! > game.awayScore!
+
   return (
-    <Link href={`/games/${game.id}`}>
-      <div className="border rounded-lg p-4 hover:border-blue-400 hover:shadow-sm transition-all cursor-pointer">
+    <Link href={`/games/${game.id}`} className="block">
+      <div className="bg-white rounded-xl border border-gray-200 px-4 py-4 hover:border-blue-300 hover:shadow-md transition-all active:scale-[0.99]">
         <div className="flex items-center justify-between mb-3">
           <GameStatusBadge status={game.status} />
-          <span className="text-xs text-gray-400">{scheduledDate} JST</span>
+          <span className="text-xs text-gray-400">{time} JST</span>
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1 text-center">
-            <p className="font-bold text-lg">{game.awayTeam}</p>
-            {game.awayScore !== null && (
-              <p className="text-3xl font-bold mt-1">{game.awayScore}</p>
-            )}
-          </div>
-          <div className="text-gray-300 font-bold text-xl">vs</div>
-          <div className="flex-1 text-center">
-            <p className="font-bold text-lg">{game.homeTeam}</p>
-            {game.homeScore !== null && (
-              <p className="text-3xl font-bold mt-1">{game.homeScore}</p>
-            )}
-          </div>
+
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+          <TeamDisplay teamName={game.awayTeam} score={game.awayScore} isWinner={awayWins} size="sm" />
+          <div className="text-gray-200 font-bold text-lg pb-4">–</div>
+          <TeamDisplay teamName={game.homeTeam} score={game.homeScore} isWinner={homeWins} size="sm" />
         </div>
       </div>
     </Link>

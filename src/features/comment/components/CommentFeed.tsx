@@ -11,14 +11,15 @@ interface CommentFeedProps {
 export function CommentFeed({ comments, bottomRef }: CommentFeedProps) {
   if (comments.length === 0) {
     return (
-      <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
-        まだコメントがありません。最初のコメントを投稿しましょう！
+      <div className="flex flex-col items-center justify-center h-32 text-gray-400 gap-1">
+        <span className="text-2xl">💬</span>
+        <p className="text-sm">最初のコメントを投稿しましょう！</p>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-2 overflow-y-auto max-h-[480px] pr-1">
+    <div className="flex flex-col gap-3 overflow-y-auto max-h-[50vh] sm:max-h-[480px] pr-1">
       {comments.map((comment) => (
         <CommentItem key={comment.id} comment={comment} />
       ))}
@@ -29,7 +30,7 @@ export function CommentFeed({ comments, bottomRef }: CommentFeedProps) {
 
 function CommentItem({ comment }: { comment: Comment }) {
   const displayName = comment.profile?.displayName ?? '名無し'
-  const username = comment.profile?.username ?? ''
+  const username = comment.profile?.username
   const time = new Date(comment.createdAt).toLocaleTimeString('ja-JP', {
     hour: '2-digit',
     minute: '2-digit',
@@ -37,14 +38,18 @@ function CommentItem({ comment }: { comment: Comment }) {
   })
 
   return (
-    <div className="flex gap-2 text-sm">
-      <span className="text-gray-400 shrink-0 pt-0.5">{time}</span>
-      <div>
-        <span className="font-semibold text-blue-600 mr-1">{displayName}</span>
-        {username && (
-          <span className="text-gray-400 text-xs mr-1">@{username}</span>
-        )}
-        <span className="text-gray-800">{comment.content}</span>
+    <div className="flex gap-2.5 text-sm">
+      {/* アバター */}
+      <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+        {displayName.charAt(0).toUpperCase()}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline gap-1.5 flex-wrap">
+          <span className="font-semibold text-gray-800 text-xs">{displayName}</span>
+          {username && <span className="text-gray-400 text-xs">@{username}</span>}
+          <span className="text-gray-300 text-xs">{time}</span>
+        </div>
+        <p className="text-gray-700 mt-0.5 break-words leading-relaxed">{comment.content}</p>
       </div>
     </div>
   )
