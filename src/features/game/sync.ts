@@ -1,48 +1,13 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { fetchGames, type BallDontLieGame } from '@/lib/balldontlie/client'
 
-// 米国東部時間のDST判定 (EDT: 3月第2日曜 〜 11月第1日曜)
-function isEasternDST(date: Date): boolean {
-  const year = date.getUTCFullYear()
-  const month = date.getUTCMonth() + 1 // 1-12
-
-  if (month < 3 || month > 11) return false
-  if (month > 3 && month < 11) return true
-
-  if (month === 3) {
-    const march1 = new Date(Date.UTC(year, 2, 1))
-    const firstSun = (7 - march1.getUTCDay()) % 7 + 1
-    const secondSun = firstSun + 7
-    return date.getUTCDate() >= secondSun
-  }
-
-  // month === 11
-  const nov1 = new Date(Date.UTC(year, 10, 1))
-  const firstSun = (7 - nov1.getUTCDay()) % 7 + 1
-  return date.getUTCDate() < firstSun
-}
-
-// "7:30 pm ET" + "2026-04-04" → UTC ISO文字列
-// フォーマットに合わない場合は日付の午前0時UTCにフォールバック
+// statusがISO UTC文字列 ("2026-04-04T19:00:00Z") の場合はそのまま使用
+// それ以外 (Final / Qtr 3 5:23 等) は日付の午前0時UTCにフォールバック
 export function parseScheduledAt(dateStr: string, status: string): string {
-  const m = status.match(/^(\d{1,2}):(\d{2})\s*(am|pm)\s*ET$/i)
-  if (!m) {
-    return new Date(`${dateStr}T00:00:00Z`).toISOString()
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(status)) {
+    return status
   }
-
-  let h = parseInt(m[1]!, 10)
-  const min = parseInt(m[2]!, 10)
-  const ampm = m[3]!.toLowerCase()
-
-  if (ampm === 'pm' && h !== 12) h += 12
-  if (ampm === 'am' && h === 12) h = 0
-
-  // EDT = UTC-4, EST = UTC-5
-  const dateRef = new Date(`${dateStr}T00:00:00Z`)
-  const offsetHours = isEasternDST(dateRef) ? 4 : 5
-  const d = new Date(`${dateStr}T00:00:00Z`)
-  d.setUTCHours(h + offsetHours, min, 0, 0)
-  return d.toISOString()
+  return new Date(`${dateStr}T00:00:00Z`).toISOString()
 }
 
 function toGameStatus(apiGame: BallDontLieGame): 'scheduled' | 'live' | 'final' {
