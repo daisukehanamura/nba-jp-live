@@ -16,32 +16,20 @@ NBA日本語リアルタイムコメントアプリ。日本語NBAファンが�
 
 ---
 
-## アーキテクチャ: DDD（ドメイン駆動設計）
+## アーキテクチャ方針
 
-このプロジェクトはDDDの考え方に基づき、以下の4層で構成する。
+DDDの考え方（関心の分離・ドメインロジックの明確化）を取り入れるが、**過剰な抽象化はしない**。読みやすさと実用性を優先する。
 
-```
-Presentation層  →  Application層  →  Domain層
-                                        ↑
-                   Infrastructure層 ────┘
-```
+### 基本的な考え方
+- ビジネスロジックをUIから分離する
+- データアクセスを1箇所に集約する（Repository Pattern）
+- 型とZodスキーマでドメインの境界を明確にする
+- **抽象化レイヤーを増やすのは、本当に必要になってから**
 
-### 各層の責務
-
-| 層 | 場所 | 責務 |
-|---|---|---|
-| **Domain** | `features/*/domain/` | ビジネスルール。外部依存ゼロ。エンティティ・値オブジェクト・リポジトリインターフェース |
-| **Application** | `features/*/application/` | ユースケース。Domainを組み合わせてビジネスフローを実現 |
-| **Infrastructure** | `features/*/infrastructure/` | RepositoryのSupabase実装・外部APIクライアント |
-| **Presentation** | `features/*/presentation/` | React コンポーネント・カスタムフック |
-
-### 依存ルール（厳守）
-
-- Domain層は他の層に依存しない
-- Application層はDomain層のみに依存する
-- Infrastructure層はDomain層のインターフェースを実装する
-- Presentation層はApplication層のユースケースを呼び出す
-- 層をまたいだ直接参照を行わない（例: PresentationからRepositoryを直接呼ばない）
+### NG例（過剰なDDD）
+- ユースケースクラスが `execute()` を1つ呼ぶだけのラッパーになる
+- インターフェースの実装が1つしかないのにインターフェースを定義する
+- 値オブジェクトがただのstring wrapperになる
 
 ---
 
@@ -49,70 +37,57 @@ Presentation層  →  Application層  →  Domain層
 
 ```
 src/
-  app/                        # Next.js App Router（ルーティングのみ。ロジックを書かない）
+  app/                      # Next.js App Router（ルーティング・レイアウトのみ）
   features/
-    game/                     # 試合ドメイン
-      domain/
-        Game.ts               # Gameエンティティ
-        GameStatus.ts         # GameStatus値オブジェクト
-        IGameRepository.ts    # リポジトリインターフェース
-      application/
-        GetLiveGames.ts       # ユースケース
-        GetGameById.ts
-      infrastructure/
-        SupabaseGameRepository.ts
-      presentation/
-        components/
-        hooks/
-    comment/                  # コメントドメイン
-      domain/
-        Comment.ts
-        ICommentRepository.ts
-      application/
-        PostComment.ts
-        GetComments.ts
-      infrastructure/
-        SupabaseCommentRepository.ts
-      presentation/
-        components/
-        hooks/
-    quote-card/               # 引用カードドメイン
-      domain/
-        QuoteCard.ts
-        QuoteSource.ts        # 値オブジェクト（x | reddit）
-        IQuoteCardRepository.ts
-      application/
-        GetQuoteCards.ts
-      infrastructure/
-        SupabaseQuoteCardRepository.ts
-        XApiClient.ts
-        RedditApiClient.ts
-      presentation/
-        components/
-        hooks/
-    auth/                     # 認証ドメイン
-      domain/
-        Profile.ts
-        IProfileRepository.ts
-      application/
-        GetProfile.ts
-        UpdateProfile.ts
-      infrastructure/
-        SupabaseProfileRepository.ts
-      presentation/
-        components/
-        hooks/
-  components/                 # 共通UIコンポーネント（ドメイン非依存）
-  hooks/                      # 共通カスタムフック
+    game/                   # 試合機能
+      components/           # UIコンポーネント
+      hooks/                # データフェッチ・状態管理
+      repository.ts         # Supabaseへのデータアクセス
+      schema.ts             # Zodスキーマ + 型定義
+      types.ts              # feature固有の型
+    comment/                # コメント機能
+      components/
+      hooks/
+      repository.ts
+      schema.ts
+      types.ts
+    quote-card/             # X/Reddit引用カード
+      components/
+      hooks/
+      repository.ts
+      schema.ts
+      types.ts
+    auth/                   # 認証
+      components/
+      hooks/
+      repository.ts
+      schema.ts
+      types.ts
+  components/               # 共通UIコンポーネント
+  hooks/                    # 共通カスタムフック
   lib/
-    supabase/                 # Supabaseクライアント初期化
-    x-api/                    # X API基底クライアント
-    reddit/                   # Reddit API基底クライアント
-  types/                      # 共通型定義（API Responseフォーマットなど）
-  utils/                      # 純粋なユーティリティ関数（副作用なし）
-docs/                         # セットアップログ・設計ドキュメント
+    supabase/               # Supabaseクライアント（server/client分離）
+    x-api/                  # X APIクライアント
+    reddit/                 # Reddit APIクライアント
+  types/                    # 共通型（ApiResponse等）
+  utils/                    # 純粋なユーティリティ関数
+docs/                       # セットアップログ・設計ドキュメント
 supabase/
-  migrations/                 # DBマイグレーション
+  migrations/               # DBマイグレーション
+```
+
+### 複雑度が増したら分割する
+feature内のロジックが複雑になった場合は以下のように分割することを検討する（最初から作らない）：
+
+```
+features/comment/
+  components/
+  hooks/
+  repository.ts
+  schema.ts
+  types.ts
+  actions.ts    # ← Server Actionsが増えたら追加
+  utils.ts      # ← feature固有のユーティリティが増えたら追加
 ```
 
 ---
