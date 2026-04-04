@@ -22,15 +22,10 @@ function parseGame(row: Record<string, unknown>): Game | null {
 export async function getGamesByDate(date: string): Promise<Game[]> {
   const supabase = await createClient()
 
-  // NBA の試合は ET（UTC-4〜UTC-5）なので日付範囲を広めに取る
-  const start = `${date}T00:00:00.000Z`
-  const end = `${date}T23:59:59.999Z`
-
   const { data, error } = await supabase
     .from('games')
     .select('*')
-    .gte('scheduled_at', start)
-    .lte('scheduled_at', end)
+    .eq('game_date', date)
     .order('scheduled_at', { ascending: true })
 
   if (error || !data) return []

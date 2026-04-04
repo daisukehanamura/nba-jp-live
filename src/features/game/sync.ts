@@ -21,6 +21,7 @@ function toDbGame(game: BallDontLieGame) {
   const scheduledAt = parseScheduledAt(game.date, game.status)
   return {
     external_id: String(game.id),
+    game_date: game.date,           // NBAのET基準日付 (YYYY-MM-DD)
     home_team: game.home_team.full_name,
     away_team: game.visitor_team.full_name,
     home_score: status !== 'scheduled' ? game.home_team_score : null,
