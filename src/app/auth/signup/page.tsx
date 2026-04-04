@@ -8,12 +8,12 @@ export default function SignUpPage() {
         <div className="text-center mb-8">
           <p className="text-3xl mb-2">🏀</p>
           <h1 className="text-2xl font-bold">アカウント作成</h1>
-          <p className="text-sm text-gray-400 mt-1">日本語NBAコミュニティに参加する</p>
+          <p className="text-sm text-gray-600 mt-1">日本語NBAコミュニティに参加する</p>
         </div>
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
           <SignUpForm />
         </div>
-        <p className="mt-4 text-sm text-center text-gray-400">
+        <p className="mt-4 text-sm text-center text-gray-600">
           すでにアカウントをお持ちの方は{' '}
           <Link href="/auth/login" className="text-blue-500 hover:underline font-medium">
             ログイン

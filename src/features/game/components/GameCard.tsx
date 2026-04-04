@@ -23,7 +23,7 @@ export function GameCard({ game }: GameCardProps) {
       <div className="bg-white rounded-xl border border-gray-200 px-4 py-4 hover:border-blue-300 hover:shadow-md transition-all active:scale-[0.99]">
         <div className="flex items-center justify-between mb-3">
           <GameStatusBadge status={game.status} />
-          <span className="text-xs text-gray-400">{time} JST</span>
+          <span className="text-xs text-gray-600">{time} JST</span>
         </div>
 
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
