@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation'
 import { getGameById } from '@/features/game/repository'
+import { getComments } from '@/features/comment/repository'
 import { GameStatusBadge } from '@/features/game/components/GameStatusBadge'
+import { CommentFeed } from '@/features/comment/components/CommentFeed'
+import { CommentForm } from '@/features/comment/components/CommentForm'
 
 interface GamePageProps {
   params: Promise<{ id: string }>
@@ -8,7 +11,10 @@ interface GamePageProps {
 
 export default async function GamePage({ params }: GamePageProps) {
   const { id } = await params
-  const game = await getGameById(id)
+  const [game, initialComments] = await Promise.all([
+    getGameById(id),
+    getComments(id),
+  ])
 
   if (!game) notFound()
 
@@ -23,12 +29,12 @@ export default async function GamePage({ params }: GamePageProps) {
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
+      {/* 試合情報 */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <GameStatusBadge status={game.status} />
           <span className="text-sm text-gray-400">{scheduledDate} JST</span>
         </div>
-
         <div className="flex items-center justify-between gap-4 py-6">
           <div className="flex-1 text-center">
             <p className="text-xl font-bold">{game.awayTeam}</p>
@@ -46,9 +52,13 @@ export default async function GamePage({ params }: GamePageProps) {
         </div>
       </div>
 
-      {/* M3でコメントフィードをここに追加 */}
-      <div className="border-t pt-6">
-        <p className="text-gray-400 text-sm text-center">コメント機能は近日実装予定</p>
+      {/* コメントセクション */}
+      <div className="border-t pt-6 flex flex-col gap-4">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+          コメント
+        </h2>
+        <CommentFeed gameId={game.id} initialComments={initialComments} />
+        <CommentForm gameId={game.id} />
       </div>
     </main>
   )
