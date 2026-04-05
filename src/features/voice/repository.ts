@@ -17,6 +17,7 @@ export async function getVoiceParticipantCounts(gameIds: string[]): Promise<Reco
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
         body: JSON.stringify({ room: `game-${gameId}` }),
+        cache: 'no-store',
       })
       if (!res.ok) return [gameId, 0] as const
       const data = await res.json() as { participants?: unknown[] }

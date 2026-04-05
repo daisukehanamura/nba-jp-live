@@ -22,7 +22,9 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
   const isToday = currentDate === today
   const [commentCounts, voiceCounts] = await Promise.all([
     getCommentCounts(games.map((g) => g.id)),
-    isToday ? getVoiceParticipantCounts(games.map((g) => g.id)) : Promise.resolve({} as Record<string, number>),
+    isToday
+      ? getVoiceParticipantCounts(games.map((g) => g.id)).catch(() => ({} as Record<string, number>))
+      : Promise.resolve({} as Record<string, number>),
   ])
 
   const liveGames = games.filter((g) => g.status === 'live')
