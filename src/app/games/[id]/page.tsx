@@ -81,15 +81,15 @@ export default async function GamePage({ params }: GamePageProps) {
 
       {/* コメントセクション */}
       <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm mb-4">
-        {user && profile ? (
+        {user ? (
           <CommentSection
             gameId={game.id}
             initialComments={initialComments}
             currentUserId={user.id}
             currentUserProfile={{
-              username: profile.username,
-              displayName: profile.displayName,
-              avatarUrl: profile.avatarUrl,
+              username: profile?.username ?? user.email?.split('@')[0] ?? 'user',
+              displayName: profile?.displayName ?? user.email?.split('@')[0] ?? 'ユーザー',
+              avatarUrl: profile?.avatarUrl ?? null,
             }}
           />
         ) : (

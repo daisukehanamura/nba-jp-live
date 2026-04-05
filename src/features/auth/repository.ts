@@ -34,8 +34,7 @@ export async function updateProfile(
 
   const { data, error } = await supabase
     .from('profiles')
-    .update({ display_name: displayName, avatar_url: avatarUrl })
-    .eq('id', userId)
+    .upsert({ id: userId, display_name: displayName, avatar_url: avatarUrl })
     .select()
     .single()
 
