@@ -50,7 +50,6 @@ export function CommentFeed({ comments, scrollContainerRef, bottomRef }: Comment
 
 function CommentItem({ comment }: { comment: Comment }) {
   const displayName = comment.profile?.displayName ?? '名無し'
-  const username = comment.profile?.username
   const time = new Date(comment.createdAt).toLocaleTimeString('ja-JP', {
     hour: '2-digit',
     minute: '2-digit',
@@ -65,7 +64,6 @@ function CommentItem({ comment }: { comment: Comment }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-1.5 flex-wrap">
           <span className="font-semibold text-gray-800 text-xs">{displayName}</span>
-          {username && <span className="text-gray-600 text-xs">@{username}</span>}
           <span className="text-gray-400 text-xs">{time}</span>
         </div>
         <p className="text-gray-700 mt-0.5 break-words leading-relaxed">{comment.content}</p>
