@@ -2,57 +2,71 @@
 
 ## システム全体図
 
+```mermaid
+graph TD
+  subgraph Client["クライアント (Browser / PWA)"]
+    A["/games 試合一覧"]
+    B["/games/[id] 試合詳細"]
+    C["/profile マイページ"]
+    D["/ranking ランキング"]
+  end
+
+  subgraph Vercel["Next.js / Vercel (バックエンド)"]
+    E["Server Components\nAPI Routes"]
+    F["/api/cron/*\n定期処理"]
+  end
+
+  subgraph Supabase["Supabase"]
+    G["Auth\nメール認証・セッション管理"]
+    H["PostgreSQL\nprofiles / games / comments / predictions"]
+    I["Realtime\nコメントのリアルタイム配信"]
+  end
+
+  J["balldontlie API\nNBA試合データ・スコア"]
+  K["LiveKit Cloud\n音声通話 SFU\n最大5人/ルーム"]
+  L["cron-job.org\n5分毎・1時間毎に実行"]
+
+  A & B & C & D -->|HTTP / RSC| E
+  E -->|認証確認・データ取得| Supabase
+  B -->|WebRTC 音声| K
+  E -->|JWT発行| K
+  L -->|HTTP trigger| F
+  F -->|試合データ同期| H
+  F -->|ポイント精算| H
+  J -->|スコア・スケジュール取得| F
+  I -->|WebSocket| B
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        クライアント                           │
-│                   (Browser / PWA)                            │
-│                                                             │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
-│  │  試合一覧     │  │  試合詳細     │  │  マイページ/      │  │
-│  │  /games      │  │  /games/[id] │  │  ランキング       │  │
-│  └──────────────┘  └──────┬───────┘  └──────────────────┘  │
-│                            │                                 │
-│                   ┌────────┴────────┐                        │
-│                   │  コメント        │  音声通話              │
-│                   │  予測パネル      │  (LiveKit SDK)         │
-│                   │  VoiceRoom      │                        │
-└───────────────────┼─────────────────┼────────────────────────┘
-                    │                 │
-                    ▼                 ▼
-┌───────────────────────────┐  ┌─────────────────────────────┐
-│       Next.js (Vercel)    │  │      LiveKit Cloud          │
-│                           │  │                             │
-│  App Router               │  │  音声SFUサーバー             │
-│  Server Components        │  │  最大5人/ルーム              │
-│  ├ /api/voice/token       │  │  無料枠 50,000分/月          │
-│  ├ /api/profile           │  │                             │
-│  ├ /api/predictions       │  └─────────────────────────────┘
-│  ├ /api/comments          │
-│  └ /api/cron/*            │
-│       ↑ 定期実行           │
-└───────────┬───────────────┘
-            │
-            ▼
-┌───────────────────────────────────────────────────────────┐
-│                    Supabase                                │
-│                                                           │
-│  ┌─────────────┐  ┌──────────────┐  ┌─────────────────┐  │
-│  │  Auth       │  │  PostgreSQL  │  │  Realtime       │  │
-│  │             │  │              │  │                 │  │
-│  │  メール認証  │  │  profiles    │  │  コメント        │  │
-│  │  セッション  │  │  games       │  │  リアルタイム    │  │
-│  │             │  │  comments    │  │  購読            │  │
-│  │             │  │  predictions │  │                 │  │
-│  └─────────────┘  └──────────────┘  └─────────────────┘  │
-└───────────────────────────────────────────────────────────┘
-            ▲
-            │ 試合データ同期 (cron 5分毎)
-            │
-┌───────────────────────┐
-│   balldontlie API     │
-│   NBA試合スコア・      │
-│   スケジュール         │
-└───────────────────────┘
+
+## データフロー図
+
+```mermaid
+sequenceDiagram
+  participant U as ユーザー
+  participant FE as Next.js (Vercel)
+  participant SB as Supabase
+  participant BDL as balldontlie API
+  participant LK as LiveKit Cloud
+
+  Note over FE,BDL: 試合データ同期 (5分毎)
+  FE->>BDL: GET /games (live)
+  BDL-->>FE: 試合・スコアデータ
+  FE->>SB: games テーブル upsert
+
+  Note over U,SB: ユーザー登録
+  U->>FE: SignUp (email/pass/username)
+  FE->>SB: auth.signUp()
+  SB-->>SB: トリガー: profiles 自動作成
+
+  Note over U,LK: 音声通話参加
+  U->>FE: POST /api/voice/token
+  FE->>LK: 参加人数確認 (上限5人)
+  FE-->>U: JWT トークン
+  U->>LK: WebRTC 接続
+
+  Note over U,SB: コメント投稿
+  U->>FE: POST /api/comments
+  FE->>SB: INSERT into comments
+  SB-->>U: Realtime で全員に配信
 ```
 
 ## 主要コンポーネント早見表
