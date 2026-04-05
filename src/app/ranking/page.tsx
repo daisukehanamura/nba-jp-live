@@ -16,7 +16,7 @@ export default async function RankingPage() {
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-6 flex flex-col gap-4">
-      <h1 className="text-2xl font-bold text-gray-900">🏆 予想ランキング</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🏆 予想ランキング</h1>
 
       {/* 仕組み説明 */}
       <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 flex flex-col gap-2">
