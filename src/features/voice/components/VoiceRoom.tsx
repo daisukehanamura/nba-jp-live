@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -12,6 +12,18 @@ import '@livekit/components-styles'
 interface VoiceRoomProps {
   gameId: string
   isLoggedIn: boolean
+  scheduledAt: string
+}
+
+function isTodayGame(scheduledAt: string): boolean {
+  // アプリの「今日」= JST今日 - 1日（NBA試合はET夜→JST翌朝放映のため）
+  const jstToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date())
+  const d = new Date(`${jstToday}T12:00:00Z`)
+  d.setUTCDate(d.getUTCDate() - 1)
+  const todayGameDate = d.toISOString().split('T')[0]!
+
+  const gameEtDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date(scheduledAt))
+  return todayGameDate === gameEtDate
 }
 
 function ParticipantList() {
@@ -20,7 +32,6 @@ function ParticipantList() {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* リモート音声再生 */}
       <RoomAudioRenderer />
 
       <div className="flex items-center justify-between">
@@ -59,11 +70,29 @@ function ParticipantList() {
   )
 }
 
-export function VoiceRoom({ gameId, isLoggedIn }: VoiceRoomProps) {
+export function VoiceRoom({ gameId, isLoggedIn, scheduledAt }: VoiceRoomProps) {
   const [token, setToken] = useState<string | null>(null)
   const [roomName, setRoomName] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [participantCount, setParticipantCount] = useState(0)
+
+  const isToday = isTodayGame(scheduledAt)
+
+  const fetchCount = useCallback(async () => {
+    if (!isToday) return
+    const res = await fetch(`/api/voice/participants?gameId=${gameId}`)
+    if (res.ok) {
+      const data = await res.json() as { count: number }
+      setParticipantCount(data.count)
+    }
+  }, [gameId, isToday])
+
+  useEffect(() => {
+    fetchCount()
+    const interval = setInterval(fetchCount, 30_000)
+    return () => clearInterval(interval)
+  }, [fetchCount])
 
   const join = useCallback(async () => {
     setLoading(true)
@@ -87,7 +116,8 @@ export function VoiceRoom({ gameId, isLoggedIn }: VoiceRoomProps) {
   const leave = useCallback(() => {
     setToken(null)
     setRoomName(null)
-  }, [])
+    fetchCount()
+  }, [fetchCount])
 
   if (!isLoggedIn) {
     return (
@@ -96,6 +126,16 @@ export function VoiceRoom({ gameId, isLoggedIn }: VoiceRoomProps) {
           🎙️ 音声通話に参加するには
           <a href="/auth/login" className="text-orange-500 font-medium ml-1">ログイン</a>
           が必要です
+        </p>
+      </div>
+    )
+  }
+
+  if (!isToday) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+        <p className="text-sm text-gray-600 text-center">
+          🎙️ 音声通話は本日の試合のみ利用できます
         </p>
       </div>
     )
@@ -131,7 +171,12 @@ export function VoiceRoom({ gameId, isLoggedIn }: VoiceRoomProps) {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-sm font-bold text-gray-900">🎙️ 音声通話</h3>
-          <p className="text-xs text-gray-500 mt-0.5">最大5人で試合を語ろう</p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            最大5人で試合を語ろう
+            {participantCount > 0 && (
+              <span className="ml-1.5 text-green-500 font-medium">● {participantCount}人が通話中</span>
+            )}
+          </p>
         </div>
         <button
           onClick={join}

@@ -92,7 +92,7 @@ export default async function GamePage({ params }: GamePageProps) {
       />
 
       {/* 音声通話 */}
-      <VoiceRoom gameId={game.id} isLoggedIn={!!user} />
+      <VoiceRoom gameId={game.id} isLoggedIn={!!user} scheduledAt={game.scheduledAt} />
 
       {/* コメントセクション */}
       <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm mb-4">
