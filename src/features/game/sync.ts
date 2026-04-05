@@ -18,7 +18,10 @@ function toGameStatus(apiGame: BallDontLieGame): 'scheduled' | 'live' | 'final' 
 
 function toDbGame(game: BallDontLieGame) {
   const status = toGameStatus(game)
-  const scheduledAt = parseScheduledAt(game.date, game.status)
+  // datetime は常に正しいUTC開始時刻を持つ (scheduled/live/final問わず)
+  const scheduledAt = game.datetime
+    ? new Date(game.datetime).toISOString()
+    : parseScheduledAt(game.date, game.status)
   return {
     external_id: String(game.id),
     game_date: game.date,

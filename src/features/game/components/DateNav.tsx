@@ -42,6 +42,7 @@ export function DateNav({ currentDate }: DateNavProps) {
     <div className="flex items-center justify-between gap-2">
       <Link
         href={`/games?date=${prevDate}`}
+        prefetch={true}
         className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors"
       >
         ← {formatDisplay(prevDate)}
@@ -63,6 +64,7 @@ export function DateNav({ currentDate }: DateNavProps) {
         )}
         <Link
           href={`/games?date=${nextDate}`}
+          prefetch={true}
           className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors"
         >
           {formatDisplay(nextDate)} →

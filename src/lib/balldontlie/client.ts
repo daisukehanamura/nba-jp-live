@@ -9,11 +9,12 @@ function getHeaders() {
 export interface BallDontLieGame {
   id: number
   date: string
+  datetime: string  // UTC ISO文字列 "2026-04-04T19:00:00.000Z" (常に正しい開始時刻)
   home_team: { full_name: string }
   visitor_team: { full_name: string }
   home_team_score: number
   visitor_team_score: number
-  status: string  // 'Final' | '7:30 pm ET' | 'Qtr 3 5:23' 等
+  status: string  // scheduled時はISO文字列 / live時は "Qtr 3 5:23" / 終了時は "Final"
   period: number
   time: string
 }
