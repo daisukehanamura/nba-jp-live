@@ -15,13 +15,13 @@ export async function Header() {
           🏀 <span>HOOPMIN</span>
         </Link>
 
-        {profile ? (
+        {user ? (
           <Link
             href="/profile"
             className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors"
           >
-            <Avatar avatarUrl={profile.avatarUrl} displayName={profile.displayName} size="sm" />
-            <span className="hidden sm:inline">{profile.displayName}</span>
+            <Avatar avatarUrl={profile?.avatarUrl} displayName={profile?.displayName ?? user.email?.split('@')[0] ?? 'U'} size="sm" />
+            <span className="hidden sm:inline">{profile?.displayName ?? 'マイページ'}</span>
           </Link>
         ) : (
           <Link href="/auth/login" className="text-sm text-gray-300 hover:text-white transition-colors">
