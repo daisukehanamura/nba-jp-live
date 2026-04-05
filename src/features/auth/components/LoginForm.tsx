@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { SignInSchema, type SignInInput } from '../schema'
 
@@ -9,7 +8,6 @@ const inputClass = 'w-full bg-[#0d1117] border border-gray-700 rounded-lg px-3 p
 const labelClass = 'block text-xs font-medium text-gray-400 mb-1'
 
 export function LoginForm() {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -40,8 +38,8 @@ export function LoginForm() {
       return
     }
 
-    router.push('/games')
-    router.refresh()
+    // フルリロードでServer Componentのセッション状態を確実に更新
+    window.location.href = '/games'
   }
 
   return (

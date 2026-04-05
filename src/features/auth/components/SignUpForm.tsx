@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { SignUpSchema, type SignUpInput } from '../schema'
 
@@ -9,7 +8,6 @@ const inputClass = 'w-full bg-[#0d1117] border border-gray-700 rounded-lg px-3 p
 const labelClass = 'block text-xs font-medium text-gray-400 mb-1'
 
 export function SignUpForm() {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -52,8 +50,7 @@ export function SignUpForm() {
     }
 
     if (data.user) {
-      router.push('/games')
-      router.refresh()
+      window.location.href = '/games'
     }
   }
 
