@@ -8,16 +8,16 @@ interface DateNavProps {
 
 function formatDisplay(dateStr: string): string {
   const date = new Date(`${dateStr}T12:00:00Z`)
-  const today = new Date()
-  const todayStr = today.toISOString().split('T')[0]
-  const yesterday = new Date(today)
+  const jst = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' })
+  const todayStr = jst.format(new Date())
+  const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
-  const tomorrowDate = new Date(today)
+  const tomorrowDate = new Date()
   tomorrowDate.setDate(tomorrowDate.getDate() + 1)
 
   if (dateStr === todayStr) return '今日'
-  if (dateStr === yesterday.toISOString().split('T')[0]) return '昨日'
-  if (dateStr === tomorrowDate.toISOString().split('T')[0]) return '明日'
+  if (dateStr === jst.format(yesterday)) return '昨日'
+  if (dateStr === jst.format(tomorrowDate)) return '明日'
 
   return date.toLocaleDateString('ja-JP', {
     month: 'long',
@@ -36,7 +36,7 @@ function shiftDate(dateStr: string, days: number): string {
 export function DateNav({ currentDate }: DateNavProps) {
   const prevDate = shiftDate(currentDate, -1)
   const nextDate = shiftDate(currentDate, 1)
-  const todayStr = new Date().toISOString().split('T')[0]!
+  const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date())
 
   return (
     <div className="flex items-center justify-between gap-2">

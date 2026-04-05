@@ -9,7 +9,7 @@ interface GamesPageProps {
 
 export default async function GamesPage({ searchParams }: GamesPageProps) {
   const { date } = await searchParams
-  const today = new Date().toISOString().split('T')[0]!
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date())
   const currentDate = date ?? today
 
   const games = await getGamesByDate(currentDate)
