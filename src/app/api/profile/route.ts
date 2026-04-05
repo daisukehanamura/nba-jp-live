@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { updateProfile, createProfile } from '@/features/auth/repository'
+import { updateProfile, createProfile, getProfile } from '@/features/auth/repository'
 import { ok, err } from '@/types/api'
 
 const UpdateProfileSchema = z.object({
@@ -28,7 +28,18 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json(err('入力内容を確認してください'), { status: 400 })
   }
 
-  const profile = await updateProfile(user.id, result.data.displayName, result.data.avatarUrl ?? null)
+  let profile = await updateProfile(user.id, result.data.displayName, result.data.avatarUrl ?? null)
+
+  if (!profile) {
+    // プロフィールが存在しない場合は新規作成
+    const existing = await getProfile(user.id)
+    if (!existing) {
+      const emailPrefix = user.email?.split('@')[0] ?? 'user'
+      const suffix = user.id.replace(/-/g, '').slice(0, 4)
+      profile = await createProfile(user.id, `${emailPrefix}_${suffix}`, result.data.displayName)
+    }
+  }
+
   if (!profile) {
     return NextResponse.json(err('更新に失敗しました'), { status: 500 })
   }
