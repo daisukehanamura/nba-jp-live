@@ -10,6 +10,7 @@ interface PredictionPanelProps {
   homeTeam: string
   awayTeam: string
   gameStatus: GameStatus
+  period: number
   initialSummary: PredictionSummary
   isLoggedIn: boolean
 }
@@ -19,6 +20,7 @@ export function PredictionPanel({
   homeTeam,
   awayTeam,
   gameStatus,
+  period,
   initialSummary,
   isLoggedIn,
 }: PredictionPanelProps) {
@@ -32,7 +34,9 @@ export function PredictionPanel({
 
   const hasVoted = summary.userPrediction !== null
   const isFinal = gameStatus === 'final'
-  const showResults = hasVoted || isFinal
+  // Q3以降（ハーフタイム後）は予測締め切り
+  const isClosed = gameStatus === 'live' && period >= 3
+  const showResults = hasVoted || isFinal || isClosed
 
   async function handleVote(predictedWinner: PredictedWinner) {
     if (!isLoggedIn || hasVoted || loading) return
@@ -85,6 +89,7 @@ export function PredictionPanel({
           userPointsEarned={summary.userPointsEarned}
           total={total}
           isFinal={isFinal}
+          isClosed={isClosed}
         />
       ) : (
         <VoteButtons
@@ -166,6 +171,7 @@ function ResultsView({
   userPointsEarned,
   total,
   isFinal,
+  isClosed,
 }: {
   homeTeam: string
   awayTeam: string
@@ -176,9 +182,16 @@ function ResultsView({
   userPointsEarned: number | null
   total: number
   isFinal: boolean
+  isClosed: boolean
 }) {
   return (
     <div className="flex flex-col gap-3">
+      {isClosed && !userPrediction && (
+        <p className="text-xs text-center text-gray-500 bg-gray-50 rounded-lg py-2">
+          🔒 ハーフタイムを過ぎたため締め切りました
+        </p>
+      )}
+
       <div className="flex rounded-full overflow-hidden h-3">
         <div className="bg-blue-500 transition-all duration-500" style={{ width: `${awayPercent}%` }} />
         <div className="bg-orange-400 transition-all duration-500" style={{ width: `${homePercent}%` }} />
@@ -212,7 +225,7 @@ function ResultsView({
             {userPointsEarned === 0 && isFinal && (
               <span className="text-gray-500 ml-1">（はずれ）</span>
             )}
-            {userPointsEarned === null && isFinal === false && (
+            {userPointsEarned === null && !isFinal && (
               <span className="text-gray-500 ml-1">（結果待ち）</span>
             )}
           </span>

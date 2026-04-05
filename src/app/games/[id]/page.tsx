@@ -73,6 +73,7 @@ export default async function GamePage({ params }: GamePageProps) {
         homeTeam={game.homeTeam}
         awayTeam={game.awayTeam}
         gameStatus={game.status}
+        period={game.period}
         initialSummary={predictionSummary}
         isLoggedIn={!!user}
       />
