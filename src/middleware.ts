@@ -1,7 +1,15 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_PATHS = ['/auth/login', '/auth/signup', '/auth/callback', '/api/cron']
+// 閲覧系はログイン不要。コメント投稿・予測・プロフィールはログイン必須
+const PUBLIC_PATHS = [
+  '/',
+  '/games',
+  '/auth/login',
+  '/auth/signup',
+  '/auth/callback',
+  '/api/cron',
+]
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })

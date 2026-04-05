@@ -6,6 +6,7 @@ import { getProfile } from '@/features/auth/repository'
 import { GameStatusBadge } from '@/features/game/components/GameStatusBadge'
 import { TeamDisplay } from '@/features/game/components/TeamDisplay'
 import { CommentSection } from '@/features/comment/components/CommentSection'
+import { GuestCommentView } from '@/features/comment/components/GuestCommentView'
 import { PredictionPanel } from '@/features/prediction/components/PredictionPanel'
 import { getPredictionSummary } from '@/features/prediction/repository'
 import { createClient } from '@/lib/supabase/server'
@@ -92,13 +93,7 @@ export default async function GamePage({ params }: GamePageProps) {
             }}
           />
         ) : (
-          <p className="text-center text-sm text-gray-600 py-10">
-            コメントするには{' '}
-            <Link href="/auth/login" className="text-blue-500 hover:underline font-medium">
-              ログイン
-            </Link>
-            {' '}が必要です
-          </p>
+          <GuestCommentView gameId={game.id} initialComments={initialComments} />
         )}
       </div>
     </main>
