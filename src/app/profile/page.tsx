@@ -4,6 +4,7 @@ import { getProfile } from '@/features/auth/repository'
 import { getUserPredictions } from '@/features/prediction/repository'
 import { ProfileEditForm } from '@/features/auth/components/ProfileEditForm'
 import { LogoutButton } from '@/features/auth/components/LogoutButton'
+import { Avatar } from '@/components/Avatar'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -12,7 +13,9 @@ export default async function ProfilePage() {
   if (!user) redirect('/auth/login')
 
   const profile = await getProfile(user.id)
-  if (!profile) redirect('/auth/login')
+  // profileがなくてもページは表示する（作成されていない場合のフォールバック）
+  const displayName = profile?.displayName ?? user.email?.split('@')[0] ?? 'ユーザー'
+  const username = profile?.username ?? ''
 
   const [{ data: recentComments }, predictionHistory] = await Promise.all([
     supabase
@@ -24,12 +27,13 @@ export default async function ProfilePage() {
     getUserPredictions(user.id),
   ])
 
-  const joinedAt = new Date(profile.createdAt).toLocaleDateString('ja-JP', {
+  const joinedAt = profile ? new Date(profile.createdAt).toLocaleDateString('ja-JP', {
     year: 'numeric', month: 'long', day: 'numeric',
-  })
+  }) : ''
 
   const correctCount = predictionHistory.filter((p) => p.pointsEarned && p.pointsEarned > 0).length
   const settledCount = predictionHistory.filter((p) => p.pointsEarned !== null).length
+  const points = profile?.points ?? 0
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-6 flex flex-col gap-4">
@@ -38,17 +42,15 @@ export default async function ProfilePage() {
       {/* プロフィールカード */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl font-bold shrink-0">
-            {profile.displayName.charAt(0).toUpperCase()}
-          </div>
+          <Avatar avatarUrl={profile?.avatarUrl} displayName={displayName} size="lg" />
           <div>
-            <p className="font-bold text-lg text-gray-900">{profile.displayName}</p>
-            <p className="text-sm text-gray-600">@{profile.username}</p>
-            <p className="text-xs text-gray-600 mt-0.5">{joinedAt} 登録</p>
+            <p className="font-bold text-lg text-gray-900">{displayName}</p>
+            {username && <p className="text-sm text-gray-600">@{username}</p>}
+            {joinedAt && <p className="text-xs text-gray-600 mt-0.5">{joinedAt} 登録</p>}
           </div>
         </div>
 
-        <ProfileEditForm currentDisplayName={profile.displayName} currentAvatarUrl={profile.avatarUrl} />
+        <ProfileEditForm currentDisplayName={displayName} currentAvatarUrl={profile?.avatarUrl ?? null} />
       </div>
 
       {/* ポイント・予測成績 */}
@@ -58,7 +60,7 @@ export default async function ProfilePage() {
         </h2>
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="flex flex-col items-center bg-blue-50 rounded-xl p-4">
-            <span className="text-2xl font-bold text-blue-600">{profile.points.toLocaleString()}</span>
+            <span className="text-2xl font-bold text-blue-600">{points.toLocaleString()}</span>
             <span className="text-xs text-gray-600 mt-0.5">総ポイント</span>
           </div>
           <div className="flex flex-col items-center bg-gray-50 rounded-xl p-4">
