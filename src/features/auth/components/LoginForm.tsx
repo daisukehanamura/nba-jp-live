@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { SignInSchema, type SignInInput } from '../schema'
 
+const inputClass = 'w-full bg-[#0d1117] border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent'
+const labelClass = 'block text-xs font-medium text-gray-400 mb-1'
+
 export function LoginForm() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
@@ -44,36 +47,32 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-          メールアドレス
-        </label>
+        <label htmlFor="email" className={labelClass}>メールアドレス</label>
         <input
           id="email"
           name="email"
           type="email"
           placeholder="example@email.com"
           required
-          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+          className={inputClass}
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-          パスワード
-        </label>
+        <label htmlFor="password" className={labelClass}>パスワード</label>
         <input
           id="password"
           name="password"
           type="password"
           placeholder="••••••••"
           required
-          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+          className={inputClass}
         />
       </div>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-red-400 text-xs">{error}</p>}
       <button
         type="submit"
         disabled={loading}
-        className="bg-blue-600 text-white rounded px-4 py-2 text-sm font-medium disabled:opacity-50"
+        className="w-full bg-orange-500 hover:bg-orange-400 text-white rounded-lg px-4 py-2.5 text-sm font-bold disabled:opacity-50 transition-colors mt-1"
       >
         {loading ? 'ログイン中...' : 'ログイン'}
       </button>

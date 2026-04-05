@@ -3,22 +3,33 @@ import { LoginForm } from '@/features/auth/components/LoginForm'
 
 export default function LoginPage() {
   return (
-    <main className="min-h-[calc(100vh-3rem)] flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <p className="text-3xl mb-2">🏀</p>
-          <h1 className="text-2xl font-bold">ログイン</h1>
-          <p className="text-sm text-gray-600 mt-1">Courtside JP へようこそ</p>
-        </div>
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-          <LoginForm />
-        </div>
-        <p className="mt-4 text-sm text-center text-gray-600">
+    <main className="min-h-screen bg-[#0d1117] flex flex-col items-center justify-center px-4 py-12">
+      {/* ブランドロゴ */}
+      <div className="mb-8 text-center">
+        <div className="text-5xl mb-3">🏀</div>
+        <h1 className="text-2xl font-black text-white tracking-tight">Courtside JP</h1>
+        <p className="text-gray-400 text-sm mt-1">日本語 NBA コミュニティ</p>
+      </div>
+
+      {/* フォームカード */}
+      <div className="w-full max-w-sm bg-[#161b22] border border-gray-800 rounded-2xl p-6 shadow-2xl">
+        <h2 className="text-lg font-bold text-white mb-5">ログイン</h2>
+        <LoginForm />
+        <p className="mt-5 text-sm text-center text-gray-500">
           アカウントをお持ちでない方は{' '}
-          <Link href="/auth/signup" className="text-blue-500 hover:underline font-medium">
-            新規登録
+          <Link href="/auth/signup" className="text-orange-400 hover:text-orange-300 font-medium">
+            無料登録
           </Link>
         </p>
+      </div>
+
+      {/* 特典バッジ */}
+      <div className="mt-8 flex flex-wrap justify-center gap-2">
+        {['🔥 リアルタイムスコア', '💬 絵文字スタンプ', '🎯 勝利予測'].map((f) => (
+          <span key={f} className="text-xs text-gray-500 bg-[#161b22] border border-gray-800 px-3 py-1.5 rounded-full">
+            {f}
+          </span>
+        ))}
       </div>
     </main>
   )
