@@ -8,17 +8,14 @@ interface DateNavProps {
 
 function formatDisplay(dateStr: string): string {
   const date = new Date(`${dateStr}T12:00:00Z`)
-  // game_date はNBAのET（米東部時間）ベースなのでETで比較
   const et = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' })
   const todayStr = et.format(new Date())
-  const yesterday = new Date()
-  yesterday.setDate(yesterday.getDate() - 1)
-  const tomorrowDate = new Date()
-  tomorrowDate.setDate(tomorrowDate.getDate() + 1)
+  const yesterdayStr = shiftDate(todayStr, -1)
+  const tomorrowStr = shiftDate(todayStr, 1)
 
   if (dateStr === todayStr) return '今日'
-  if (dateStr === et.format(yesterday)) return '昨日'
-  if (dateStr === et.format(tomorrowDate)) return '明日'
+  if (dateStr === yesterdayStr) return '昨日'
+  if (dateStr === tomorrowStr) return '明日'
 
   return date.toLocaleDateString('ja-JP', {
     month: 'long',
