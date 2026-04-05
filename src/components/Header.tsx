@@ -15,8 +15,8 @@ export async function Header() {
           <Link href="/games" className="font-bold text-base tracking-tight text-white flex items-center gap-2">
             🏀 <span>HOOPMIN</span>
           </Link>
-          <Link href="/ranking" className="text-sm text-gray-400 hover:text-white transition-colors">
-            ランキング
+          <Link href="/ranking" className="text-sm text-gray-300 hover:text-white transition-colors flex items-center gap-1">
+            🏆 <span>ランキング</span>
           </Link>
         </div>
 
