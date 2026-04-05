@@ -6,6 +6,17 @@ import { useComments } from '../hooks/useComments'
 import { CommentFeed } from './CommentFeed'
 import { PostCommentSchema, type Comment } from '../schema'
 
+const STAMPS = [
+  { label: '🔥', text: '🔥 ヤバ！' },
+  { label: '👏', text: '👏 ナイス！' },
+  { label: '🏀', text: '🏀 ナイシュ！' },
+  { label: '😱', text: '😱 え！？' },
+  { label: '💀', text: '💀 草' },
+  { label: '😤', text: '😤 頑張れ！' },
+  { label: '🤦', text: '🤦 もったいない' },
+  { label: '⚡', text: '⚡ はやっ！' },
+]
+
 interface CommentSectionProps {
   gameId: string
   initialComments: Comment[]
@@ -36,9 +47,7 @@ export function CommentSection({
   const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const content = inputRef.current?.value.trim() ?? ''
+  async function postContent(content: string) {
     if (!content || loading) return
 
     const validation = PostCommentSchema.safeParse({ gameId, content })
@@ -60,8 +69,6 @@ export function CommentSection({
       profile: currentUserProfile,
     })
 
-    if (inputRef.current) inputRef.current.value = ''
-
     const supabase = createClient()
     const { data, error: dbError } = await supabase
       .from('comments')
@@ -76,6 +83,13 @@ export function CommentSection({
     }
 
     setLoading(false)
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const content = inputRef.current?.value.trim() ?? ''
+    await postContent(content)
+    if (inputRef.current) inputRef.current.value = ''
   }
 
   return (
@@ -98,6 +112,22 @@ export function CommentSection({
             ↓ {unreadCount}件の新しいコメント
           </button>
         )}
+      </div>
+
+      {/* スタンプボタン */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+        {STAMPS.map((stamp) => (
+          <button
+            key={stamp.label}
+            type="button"
+            onClick={() => postContent(stamp.text)}
+            disabled={loading}
+            className="flex-shrink-0 text-xl px-2 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all disabled:opacity-40"
+            title={stamp.text}
+          >
+            {stamp.label}
+          </button>
+        ))}
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-1.5">

@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     const result = await syncLiveGames()
     // DB更新後にNext.jsキャッシュをクリア
-    revalidateTag('games')
+    revalidateTag('games', 'default')
     return NextResponse.json(ok(result))
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
