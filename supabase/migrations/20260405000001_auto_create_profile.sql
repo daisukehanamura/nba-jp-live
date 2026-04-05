@@ -22,6 +22,9 @@ begin
   )
   on conflict (id) do nothing;
   return new;
+exception when others then
+  -- プロフィール作成が失敗してもユーザー登録はブロックしない
+  return new;
 end;
 $$ language plpgsql security definer;
 

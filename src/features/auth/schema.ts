@@ -23,7 +23,7 @@ export const ProfileSchema = z.object({
   id: z.string().uuid(),
   username: z.string(),
   displayName: z.string(),
-  avatarUrl: z.string().url().nullable(),
+  avatarUrl: z.string().nullable(),
   points: z.number().int().default(0),
   createdAt: z.string(),
   updatedAt: z.string(),

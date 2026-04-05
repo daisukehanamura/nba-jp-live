@@ -50,6 +50,15 @@ export function SignUpForm() {
     }
 
     if (data.user) {
+      // トリガーでのプロフィール作成が失敗した場合に備えて明示的に作成
+      await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: result.data.username,
+          displayName: result.data.displayName,
+        }),
+      })
       window.location.href = '/games'
     }
   }
