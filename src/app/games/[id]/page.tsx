@@ -8,6 +8,7 @@ import { TeamDisplay } from '@/features/game/components/TeamDisplay'
 import { CommentSection } from '@/features/comment/components/CommentSection'
 import { GuestCommentView } from '@/features/comment/components/GuestCommentView'
 import { PredictionPanel } from '@/features/prediction/components/PredictionPanel'
+import { VoiceRoom } from '@/features/voice/components/VoiceRoom'
 import { getPredictionSummary } from '@/features/prediction/repository'
 import { createClient } from '@/lib/supabase/server'
 
@@ -78,6 +79,9 @@ export default async function GamePage({ params }: GamePageProps) {
         initialSummary={predictionSummary}
         isLoggedIn={!!user}
       />
+
+      {/* 音声通話 */}
+      <VoiceRoom gameId={game.id} isLoggedIn={!!user} />
 
       {/* コメントセクション */}
       <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm mb-4">
