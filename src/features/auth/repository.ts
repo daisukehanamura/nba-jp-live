@@ -54,6 +54,36 @@ export async function updateProfile(
   return result.success ? result.data : null
 }
 
+export interface RankingEntry {
+  id: string
+  username: string
+  displayName: string
+  avatarUrl: string | null
+  points: number
+  rank: number
+}
+
+export async function getRanking(limit = 50): Promise<RankingEntry[]> {
+  const supabase = await createClient()
+
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, username, display_name, avatar_url, points')
+    .order('points', { ascending: false })
+    .limit(limit)
+
+  if (!data) return []
+
+  return data.map((row, index) => ({
+    id: row.id,
+    username: row.username,
+    displayName: row.display_name,
+    avatarUrl: row.avatar_url,
+    points: row.points ?? 0,
+    rank: index + 1,
+  }))
+}
+
 export async function createProfile(
   userId: string,
   username: string,
