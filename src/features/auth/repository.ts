@@ -27,13 +27,14 @@ export async function getProfile(userId: string): Promise<Profile | null> {
 
 export async function updateProfile(
   userId: string,
-  displayName: string
+  displayName: string,
+  avatarUrl: string | null = null,
 ): Promise<Profile | null> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
     .from('profiles')
-    .update({ display_name: displayName })
+    .update({ display_name: displayName, avatar_url: avatarUrl })
     .eq('id', userId)
     .select()
     .single()

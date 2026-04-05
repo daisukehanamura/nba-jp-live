@@ -2,26 +2,31 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { AVATAR_PRESETS } from '@/utils/avatar'
 
 interface ProfileEditFormProps {
   currentDisplayName: string
+  currentAvatarUrl: string | null
 }
 
-export function ProfileEditForm({ currentDisplayName }: ProfileEditFormProps) {
+export function ProfileEditForm({ currentDisplayName, currentAvatarUrl }: ProfileEditFormProps) {
   const router = useRouter()
   const [displayName, setDisplayName] = useState(currentDisplayName)
+  const [avatarUrl, setAvatarUrl] = useState(currentAvatarUrl ?? '')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+  const isDirty = displayName.trim() !== currentDisplayName || avatarUrl !== (currentAvatarUrl ?? '')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = displayName.trim()
-    if (!trimmed || trimmed === currentDisplayName) return
+    if (!trimmed || !isDirty) return
 
     setStatus('loading')
     const res = await fetch('/api/profile', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ displayName: trimmed }),
+      body: JSON.stringify({ displayName: trimmed, avatarUrl: avatarUrl || null }),
     })
     const json = await res.json() as { success: boolean }
 
@@ -35,7 +40,29 @@ export function ProfileEditForm({ currentDisplayName }: ProfileEditFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      {/* アバター選択 */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-800 mb-3">アバター</label>
+        <div className="flex gap-3 flex-wrap">
+          {AVATAR_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() => setAvatarUrl(preset.id)}
+              className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all ${preset.bg} ${
+                avatarUrl === preset.id
+                  ? 'ring-4 ring-blue-500 ring-offset-2 scale-110'
+                  : 'opacity-60 hover:opacity-100 hover:scale-105'
+              }`}
+            >
+              {preset.emoji}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 表示名 */}
       <div>
         <label className="block text-sm font-semibold text-gray-800 mb-1">表示名</label>
         <input
@@ -47,9 +74,10 @@ export function ProfileEditForm({ currentDisplayName }: ProfileEditFormProps) {
         />
         <p className="text-xs text-gray-600 mt-1">{displayName.length} / 30文字</p>
       </div>
+
       <button
         type="submit"
-        disabled={status === 'loading' || displayName.trim() === currentDisplayName}
+        disabled={status === 'loading' || !isDirty}
         className="self-start bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-40 hover:bg-blue-700 transition-colors"
       >
         {status === 'loading' ? '保存中...' : status === 'success' ? '✓ 保存しました' : '保存'}

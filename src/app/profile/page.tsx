@@ -48,7 +48,7 @@ export default async function ProfilePage() {
           </div>
         </div>
 
-        <ProfileEditForm currentDisplayName={profile.displayName} />
+        <ProfileEditForm currentDisplayName={profile.displayName} currentAvatarUrl={profile.avatarUrl} />
       </div>
 
       {/* ポイント・予測成績 */}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type RefObject } from 'react'
+import { Avatar } from '@/components/Avatar'
 import type { Comment } from '../schema'
 
 const INITIAL_VISIBLE = 50
@@ -58,9 +59,8 @@ function CommentItem({ comment }: { comment: Comment }) {
 
   return (
     <div className="flex gap-2.5 text-sm">
-      {/* アバター */}
-      <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-        {displayName.charAt(0).toUpperCase()}
+      <div className="mt-0.5">
+        <Avatar avatarUrl={comment.profile?.avatarUrl} displayName={displayName} size="sm" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-1.5 flex-wrap">

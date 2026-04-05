@@ -6,6 +6,7 @@ import { ok, err } from '@/types/api'
 
 const UpdateProfileSchema = z.object({
   displayName: z.string().min(1).max(30),
+  avatarUrl: z.string().regex(/^preset_[0-5]$/).nullable().optional(),
 })
 
 export async function PATCH(request: NextRequest) {
@@ -22,7 +23,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json(err('入力内容を確認してください'), { status: 400 })
   }
 
-  const profile = await updateProfile(user.id, result.data.displayName)
+  const profile = await updateProfile(user.id, result.data.displayName, result.data.avatarUrl ?? null)
   if (!profile) {
     return NextResponse.json(err('更新に失敗しました'), { status: 500 })
   }

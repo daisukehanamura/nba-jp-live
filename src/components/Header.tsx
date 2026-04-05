@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getProfile } from '@/features/auth/repository'
+import { Avatar } from '@/components/Avatar'
 
 export async function Header() {
   const supabase = await createClient()
@@ -19,9 +20,7 @@ export async function Header() {
             href="/profile"
             className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors"
           >
-            <div className="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">
-              {profile.displayName.charAt(0).toUpperCase()}
-            </div>
+            <Avatar avatarUrl={profile.avatarUrl} displayName={profile.displayName} size="sm" />
             <span className="hidden sm:inline">{profile.displayName}</span>
           </Link>
         ) : (
