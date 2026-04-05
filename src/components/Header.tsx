@@ -12,8 +12,11 @@ export async function Header() {
     <header className="sticky top-0 z-10 bg-gray-900 border-b border-gray-800">
       <div className="max-w-3xl mx-auto px-4 h-12 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/games" className="font-bold text-base tracking-tight text-white flex items-center gap-2">
-            🏀 <span>HOOPMIN</span>
+          <Link href="/games" className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-gray-950 border border-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <img src="/icon-192.svg" alt="" className="w-full h-full" />
+            </div>
+            <span className="font-extrabold text-base tracking-widest text-orange-400">HOOPMIN</span>
           </Link>
           <Link href="/ranking" className="text-sm text-gray-300 hover:text-white transition-colors flex items-center gap-1">
             🏆 <span>ランキング</span>
