@@ -6,8 +6,10 @@ export default function SignUpPage() {
     <main className="min-h-screen bg-[#0d1117] flex flex-col items-center justify-center px-4 py-12">
       {/* ブランドロゴ */}
       <div className="mb-8 text-center">
-        <div className="text-5xl mb-3">🏀</div>
-        <h1 className="text-2xl font-black text-white tracking-tight">HOOPMIN</h1>
+        <div className="w-16 h-16 rounded-2xl overflow-hidden mx-auto mb-3">
+          <img src="/icon-192.svg" alt="HOOPMIN" className="w-full h-full" />
+        </div>
+        <h1 className="text-2xl font-extrabold text-orange-400 tracking-widest">HOOPMIN</h1>
         <p className="text-gray-400 text-sm mt-1">日本の NBA 民コミュニティ</p>
       </div>
 
