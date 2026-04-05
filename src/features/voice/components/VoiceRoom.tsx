@@ -3,12 +3,10 @@
 import { useState, useCallback } from 'react'
 import {
   LiveKitRoom,
+  RoomAudioRenderer,
   useParticipants,
   useLocalParticipant,
-  useTracks,
-  AudioTrack,
 } from '@livekit/components-react'
-import { Track } from 'livekit-client'
 import '@livekit/components-styles'
 
 interface VoiceRoomProps {
@@ -19,16 +17,11 @@ interface VoiceRoomProps {
 function ParticipantList() {
   const participants = useParticipants()
   const { localParticipant, isMicrophoneEnabled } = useLocalParticipant()
-  const tracks = useTracks([Track.Source.Microphone])
 
   return (
     <div className="flex flex-col gap-3">
       {/* リモート音声再生 */}
-      {tracks
-        .filter((t) => t.participant.identity !== localParticipant.identity)
-        .map((track) => (
-          <AudioTrack key={track.publication.trackSid} trackRef={track} />
-        ))}
+      <RoomAudioRenderer />
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 flex-wrap">
