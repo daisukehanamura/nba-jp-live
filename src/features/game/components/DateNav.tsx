@@ -6,10 +6,16 @@ interface DateNavProps {
   currentDate: string // YYYY-MM-DD
 }
 
+function getJstBasedToday(): string {
+  const jstToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date())
+  const d = new Date(`${jstToday}T12:00:00Z`)
+  d.setUTCDate(d.getUTCDate() - 1)
+  return d.toISOString().split('T')[0]!
+}
+
 function formatDisplay(dateStr: string): string {
   const date = new Date(`${dateStr}T12:00:00Z`)
-  const et = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' })
-  const todayStr = et.format(new Date())
+  const todayStr = getJstBasedToday()
   const yesterdayStr = shiftDate(todayStr, -1)
   const tomorrowStr = shiftDate(todayStr, 1)
 
@@ -34,7 +40,7 @@ function shiftDate(dateStr: string, days: number): string {
 export function DateNav({ currentDate }: DateNavProps) {
   const prevDate = shiftDate(currentDate, -1)
   const nextDate = shiftDate(currentDate, 1)
-  const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date())
+  const todayStr = getJstBasedToday()
 
   return (
     <div className="flex items-center justify-between gap-2">

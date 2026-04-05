@@ -9,8 +9,11 @@ interface GamesPageProps {
 
 export default async function GamesPage({ searchParams }: GamesPageProps) {
   const { date } = await searchParams
-  // game_date はNBAのET（米東部時間）ベースで保存されているのでETで取得
-  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date())
+  // NBAの試合はET夜→JST翌朝放映のため、JST今日-1日がJST今日放映のET日付に対応する
+  const jstToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date())
+  const d = new Date(`${jstToday}T12:00:00Z`)
+  d.setUTCDate(d.getUTCDate() - 1)
+  const today = d.toISOString().split('T')[0]!
   const currentDate = date ?? today
 
   const games = await getGamesByDate(currentDate)
