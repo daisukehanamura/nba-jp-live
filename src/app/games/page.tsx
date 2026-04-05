@@ -9,7 +9,8 @@ interface GamesPageProps {
 
 export default async function GamesPage({ searchParams }: GamesPageProps) {
   const { date } = await searchParams
-  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date())
+  // game_date はNBAのET（米東部時間）ベースで保存されているのでETで取得
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date())
   const currentDate = date ?? today
 
   const games = await getGamesByDate(currentDate)
