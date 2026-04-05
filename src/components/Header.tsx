@@ -12,7 +12,7 @@ export async function Header() {
     <header className="sticky top-0 z-10 bg-gray-900 border-b border-gray-800">
       <div className="max-w-3xl mx-auto px-4 h-12 flex items-center justify-between">
         <Link href="/games" className="font-bold text-base tracking-tight text-white flex items-center gap-2">
-          🏀 <span>Courtside JP</span>
+          🏀 <span>HOOPMIN</span>
         </Link>
 
         {profile ? (

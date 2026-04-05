@@ -7,8 +7,8 @@ import './globals.css'
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
-  title: 'Courtside JP - NBAリア��タイムコメント',
-  description: '日本語NBAファンのリアルタイムコミュニティ',
+  title: 'HOOPMIN - 日本のNBA民コミュニティ',
+  description: 'NBAをリアルタイムで語り合う日本語コミュニティ。スコア速報・勝利予測・絵文字スタンプで盛り上がろう。',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
