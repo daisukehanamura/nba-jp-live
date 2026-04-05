@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { PredictedWinner, PredictionSummary } from '../schema'
 import { calcOdds } from '../schema'
 import type { GameStatus } from '@/features/game/schema'
+import { XShareButton } from '@/components/XShareButton'
 
 interface PredictionPanelProps {
   gameId: string
@@ -13,6 +14,7 @@ interface PredictionPanelProps {
   period: number
   initialSummary: PredictionSummary
   isLoggedIn: boolean
+  gameUrl: string
 }
 
 export function PredictionPanel({
@@ -23,6 +25,7 @@ export function PredictionPanel({
   period,
   initialSummary,
   isLoggedIn,
+  gameUrl,
 }: PredictionPanelProps) {
   const [summary, setSummary] = useState(initialSummary)
   const [loading, setLoading] = useState(false)
@@ -90,6 +93,7 @@ export function PredictionPanel({
           total={total}
           isFinal={isFinal}
           isClosed={isClosed}
+          gameUrl={gameUrl}
         />
       ) : (
         <VoteButtons
@@ -172,6 +176,7 @@ function ResultsView({
   total,
   isFinal,
   isClosed,
+  gameUrl,
 }: {
   homeTeam: string
   awayTeam: string
@@ -183,6 +188,7 @@ function ResultsView({
   total: number
   isFinal: boolean
   isClosed: boolean
+  gameUrl: string
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -231,6 +237,19 @@ function ResultsView({
           </span>
         )}
       </div>
+
+      {userPrediction && userOdds && isFinal && (
+        <div className="flex justify-end">
+          <XShareButton
+            text={
+              userPointsEarned && userPointsEarned > 0
+                ? `🎯 ${userPrediction === 'away' ? awayTeam : homeTeam}の勝利を予測して+${userPointsEarned}pt獲得！\n${awayTeam} vs ${homeTeam} #HOOPMIN #NBA #NBAjapan`
+                : `😭 ${awayTeam} vs ${homeTeam} の予測をはずした...\n次こそ取り返す💪 #HOOPMIN #NBA #NBAjapan`
+            }
+            url={gameUrl}
+          />
+        </div>
+      )}
     </div>
   )
 }

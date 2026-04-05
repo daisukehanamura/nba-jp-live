@@ -11,6 +11,7 @@ import { PredictionPanel } from '@/features/prediction/components/PredictionPane
 import { VoiceRoom } from '@/features/voice/components/VoiceRoom'
 import { getPredictionSummary } from '@/features/prediction/repository'
 import { createClient } from '@/lib/supabase/server'
+import { XShareButton } from '@/components/XShareButton'
 
 interface GamePageProps {
   params: Promise<{ id: string }>
@@ -43,6 +44,12 @@ export default async function GamePage({ params }: GamePageProps) {
   const awayWins = hasScore && game.awayScore! > game.homeScore!
   const homeWins = hasScore && game.homeScore! > game.awayScore!
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://nba-jp-live-app-dell.vercel.app'
+  const gameUrl = `${appUrl}/games/${game.id}`
+  const gameShareText = hasScore
+    ? `🏀 ${game.awayTeam} ${game.awayScore} - ${game.homeScore} ${game.homeTeam}\nHOOPMINで観戦中！ #HOOPMIN #NBA #NBAjapan`
+    : `🏀 ${game.awayTeam} vs ${game.homeTeam} を観戦中！\nHOOPMINで一緒に盛り上がろう 🔥 #HOOPMIN #NBA #NBAjapan`
+
   return (
     <main className="max-w-3xl mx-auto px-4 py-6 flex flex-col gap-4">
       <Link
@@ -67,6 +74,9 @@ export default async function GamePage({ params }: GamePageProps) {
           </div>
           <TeamDisplay teamName={game.homeTeam} score={game.homeScore} isWinner={homeWins} size="lg" />
         </div>
+        <div className="flex justify-end mt-2">
+          <XShareButton text={gameShareText} url={gameUrl} />
+        </div>
       </div>
 
       {/* 勝利予測 */}
@@ -78,6 +88,7 @@ export default async function GamePage({ params }: GamePageProps) {
         period={game.period}
         initialSummary={predictionSummary}
         isLoggedIn={!!user}
+        gameUrl={gameUrl}
       />
 
       {/* 音声通話 */}
