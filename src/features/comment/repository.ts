@@ -22,6 +22,23 @@ function parseComment(row: Record<string, unknown>): Comment | null {
   return result.success ? result.data : null
 }
 
+export async function getCommentCounts(gameIds: string[]): Promise<Record<string, number>> {
+  if (gameIds.length === 0) return {}
+  const supabase = await createClient()
+
+  const { data } = await supabase
+    .from('comments')
+    .select('game_id')
+    .in('game_id', gameIds)
+
+  if (!data) return {}
+
+  return data.reduce<Record<string, number>>((acc, row) => {
+    acc[row.game_id] = (acc[row.game_id] ?? 0) + 1
+    return acc
+  }, {})
+}
+
 export async function getComments(gameId: string): Promise<Comment[]> {
   const supabase = await createClient()
 

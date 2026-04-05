@@ -1,4 +1,5 @@
 import { getGamesByDate } from '@/features/game/repository'
+import { getCommentCounts } from '@/features/comment/repository'
 import { GameCard } from '@/features/game/components/GameCard'
 import { DateNav } from '@/features/game/components/DateNav'
 import { LiveRefresh } from '@/features/game/components/LiveRefresh'
@@ -17,6 +18,7 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
   const currentDate = date ?? today
 
   const games = await getGamesByDate(currentDate)
+  const commentCounts = await getCommentCounts(games.map((g) => g.id))
 
   const liveGames = games.filter((g) => g.status === 'live')
   const scheduledGames = games.filter((g) => g.status === 'scheduled')
@@ -38,7 +40,7 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
           </h2>
           <ul className="flex flex-col gap-3">
             {liveGames.map((game) => (
-              <li key={game.id}><GameCard game={game} /></li>
+              <li key={game.id}><GameCard game={game} commentCount={commentCounts[game.id] ?? 0} /></li>
             ))}
           </ul>
         </section>
@@ -51,7 +53,7 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
           </h2>
           <ul className="flex flex-col gap-3">
             {scheduledGames.map((game) => (
-              <li key={game.id}><GameCard game={game} /></li>
+              <li key={game.id}><GameCard game={game} commentCount={commentCounts[game.id] ?? 0} /></li>
             ))}
           </ul>
         </section>
@@ -64,7 +66,7 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
           </h2>
           <ul className="flex flex-col gap-3">
             {finalGames.map((game) => (
-              <li key={game.id}><GameCard game={game} /></li>
+              <li key={game.id}><GameCard game={game} commentCount={commentCounts[game.id] ?? 0} /></li>
             ))}
           </ul>
         </section>

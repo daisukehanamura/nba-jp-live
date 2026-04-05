@@ -5,9 +5,10 @@ import { TeamDisplay } from './TeamDisplay'
 
 interface GameCardProps {
   game: Game
+  commentCount: number
 }
 
-export function GameCard({ game }: GameCardProps) {
+export function GameCard({ game, commentCount }: GameCardProps) {
   const time = new Date(game.scheduledAt).toLocaleTimeString('ja-JP', {
     hour: '2-digit',
     minute: '2-digit',
@@ -31,6 +32,11 @@ export function GameCard({ game }: GameCardProps) {
           <div className="text-gray-200 font-bold text-lg pb-4">–</div>
           <TeamDisplay teamName={game.homeTeam} score={game.homeScore} isWinner={homeWins} size="sm" />
         </div>
+        {commentCount > 0 && (
+          <div className="flex justify-end mt-1">
+            <span className="text-xs text-gray-500">💬 {commentCount}</span>
+          </div>
+        )}
       </div>
     </Link>
   )
