@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
 import { Header } from '@/components/Header'
 import { HeaderGuard } from '@/components/HeaderGuard'
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
@@ -18,6 +19,11 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'HOOPMIN',
+    startupImage: '/icon-512.svg',
+  },
+  icons: {
+    icon: '/icon-192.svg',
+    apple: '/icon-192.svg',
   },
   other: {
     'mobile-web-app-capable': 'yes',
@@ -32,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
         </HeaderGuard>
         <div className="flex-1">{children}</div>
+        <PWAInstallPrompt />
       </body>
     </html>
   )

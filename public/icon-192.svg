@@ -1,4 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
-  <rect width="192" height="192" rx="40" fill="#f97316"/>
-  <text x="96" y="130" font-size="100" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="bold" fill="white">🏀</text>
+  <defs>
+    <clipPath id="ballClip">
+      <circle cx="96" cy="78" r="48"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="192" height="192" rx="36" fill="#0f172a"/>
+
+  <!-- Basketball -->
+  <circle cx="96" cy="78" r="48" fill="#f97316"/>
+
+  <!-- Seams clipped to ball -->
+  <g clip-path="url(#ballClip)" stroke="#c2410c" stroke-width="3" fill="none" stroke-linecap="round">
+    <!-- Horizontal seam (two curves forming lens shape) -->
+    <path d="M 48 78 Q 96 58 144 78"/>
+    <path d="M 48 78 Q 96 98 144 78"/>
+    <!-- Vertical seam -->
+    <path d="M 96 30 Q 76 78 96 126"/>
+    <path d="M 96 30 Q 116 78 96 126"/>
+  </g>
+
+  <!-- HOOPMIN text -->
+  <text x="96" y="150" font-size="22" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-weight="800" fill="#f97316" letter-spacing="3">HOOPMIN</text>
+
+  <!-- Underline accent -->
+  <rect x="52" y="156" width="88" height="3" rx="1.5" fill="#f97316" opacity="0.5"/>
 </svg>

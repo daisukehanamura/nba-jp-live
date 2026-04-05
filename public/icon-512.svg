@@ -1,4 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="100" fill="#f97316"/>
-  <text x="256" y="340" font-size="260" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="bold" fill="white">🏀</text>
+  <defs>
+    <clipPath id="ballClip">
+      <circle cx="256" cy="208" r="128"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#0f172a"/>
+
+  <!-- Basketball -->
+  <circle cx="256" cy="208" r="128" fill="#f97316"/>
+
+  <!-- Seams clipped to ball -->
+  <g clip-path="url(#ballClip)" stroke="#c2410c" stroke-width="8" fill="none" stroke-linecap="round">
+    <path d="M 128 208 Q 256 155 384 208"/>
+    <path d="M 128 208 Q 256 261 384 208"/>
+    <path d="M 256 80 Q 202 208 256 336"/>
+    <path d="M 256 80 Q 310 208 256 336"/>
+  </g>
+
+  <!-- HOOPMIN text -->
+  <text x="256" y="400" font-size="58" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-weight="800" fill="#f97316" letter-spacing="8">HOOPMIN</text>
+
+  <!-- Underline accent -->
+  <rect x="138" y="416" width="236" height="8" rx="4" fill="#f97316" opacity="0.5"/>
 </svg>
