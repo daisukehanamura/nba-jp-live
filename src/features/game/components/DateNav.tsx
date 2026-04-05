@@ -14,7 +14,6 @@ function getJstBasedToday(): string {
 }
 
 function formatDisplay(dateStr: string): string {
-  const date = new Date(`${dateStr}T12:00:00Z`)
   const todayStr = getJstBasedToday()
   const yesterdayStr = shiftDate(todayStr, -1)
   const tomorrowStr = shiftDate(todayStr, 1)
@@ -23,7 +22,9 @@ function formatDisplay(dateStr: string): string {
   if (dateStr === yesterdayStr) return '昨日'
   if (dateStr === tomorrowStr) return '明日'
 
-  return date.toLocaleDateString('ja-JP', {
+  // 表示はJST日付（ET+1日）
+  const jstDate = new Date(`${shiftDate(dateStr, 1)}T12:00:00Z`)
+  return jstDate.toLocaleDateString('ja-JP', {
     month: 'long',
     day: 'numeric',
     weekday: 'short',
@@ -54,7 +55,7 @@ export function DateNav({ currentDate }: DateNavProps) {
 
       <div className="flex flex-col items-center">
         <span className="font-bold text-lg">{formatDisplay(currentDate)}</span>
-        <span className="text-xs text-gray-600">{currentDate}</span>
+        <span className="text-xs text-gray-600">{shiftDate(currentDate, 1)}</span>
       </div>
 
       <div className="flex items-center gap-2">
