@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google'
 import { Header } from '@/components/Header'
 import { HeaderGuard } from '@/components/HeaderGuard'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
+import NextTopLoader from 'nextjs-toploader'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja" className={`${geist.variable} h-full dark`}>
       <body className="min-h-full flex flex-col bg-gray-950 text-gray-100 antialiased">
+        <NextTopLoader color="#f97316" height={3} showSpinner={false} />
         <HeaderGuard>
           <Header />
         </HeaderGuard>
