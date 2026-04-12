@@ -12,12 +12,8 @@ export default async function ProfilePage() {
 
   if (!user) redirect('/auth/login')
 
-  const profile = await getProfile(user.id)
-  // profileがなくてもページは表示する（作成されていない場合のフォールバック）
-  const displayName = profile?.displayName ?? user.email?.split('@')[0] ?? 'ユーザー'
-  const username = profile?.username ?? ''
-
-  const [{ data: recentComments }, predictionHistory] = await Promise.all([
+  const [profile, { data: recentComments }, predictionHistory] = await Promise.all([
+    getProfile(user.id),
     supabase
       .from('comments')
       .select('*, games(home_team, away_team, scheduled_at)')
@@ -26,6 +22,10 @@ export default async function ProfilePage() {
       .limit(5),
     getUserPredictions(user.id),
   ])
+
+  // profileがなくてもページは表示する（作成されていない場合のフォールバック）
+  const displayName = profile?.displayName ?? user.email?.split('@')[0] ?? 'ユーザー'
+  const username = profile?.username ?? ''
 
   const joinedAt = profile ? new Date(profile.createdAt).toLocaleDateString('ja-JP', {
     year: 'numeric', month: 'long', day: 'numeric',
