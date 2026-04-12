@@ -1,5 +1,10 @@
 import { AccessToken } from 'livekit-server-sdk'
 
+type LiveKitRoom = {
+  name: string
+  numParticipants: number
+}
+
 export async function getVoiceParticipantCounts(gameIds: string[]): Promise<Record<string, number>> {
   if (gameIds.length === 0) return {}
 
@@ -11,19 +16,24 @@ export async function getVoiceParticipantCounts(gameIds: string[]): Promise<Reco
   listToken.addGrant({ roomList: true })
   const jwt = await listToken.toJwt()
 
-  const results = await Promise.all(
-    gameIds.map(async (gameId) => {
-      const res = await fetch(`${livekitUrl}/twirp/livekit.RoomService/ListParticipants`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
-        body: JSON.stringify({ room: `game-${gameId}` }),
-        cache: 'no-store',
-      })
-      if (!res.ok) return [gameId, 0] as const
-      const data = await res.json() as { participants?: unknown[] }
-      return [gameId, data.participants?.length ?? 0] as const
-    })
-  )
+  // ListRooms を1回呼んで全ルームをまとめて取得（N回→1回）
+  const res = await fetch(`${livekitUrl}/twirp/livekit.RoomService/ListRooms`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+    body: JSON.stringify({}),
+    cache: 'no-store',
+  })
 
-  return Object.fromEntries(results) as Record<string, number>
+  if (!res.ok) return {}
+
+  const data = await res.json() as { rooms?: LiveKitRoom[] }
+  const rooms = data.rooms ?? []
+
+  // game-{id} のルーム名から参加人数を引く
+  const counts: Record<string, number> = {}
+  for (const gameId of gameIds) {
+    const room = rooms.find((r) => r.name === `game-${gameId}`)
+    counts[gameId] = room?.numParticipants ?? 0
+  }
+  return counts
 }

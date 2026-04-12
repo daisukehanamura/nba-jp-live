@@ -318,6 +318,23 @@ features/comment/application/PostComment.test.ts
 
 ---
 
+## パフォーマンス原則
+
+### 外部APIの呼び出し
+- **ループ・map内でのAPI呼び出し禁止**。N件のデータに対してN回リクエストするのは最悪のパターン。必ずバッチAPI・一括取得エンドポイントを使う
+  - NG: `gameIds.map(id => fetch('/api/...?id=' + id))` （N回）
+  - OK: `fetch('/api/...?ids=' + ids.join(','))` （1回）
+- 外部サービス（LiveKit・Supabase等）のAPIはページロードのクリティカルパスに置かない。遅延・失敗しても初期表示に影響しないよう設計する
+
+### Server Componentのデータ取得
+- 依存関係のない複数のfetchは必ず `Promise.all` で並列実行する
+- ページの初期表示に必須でないデータ（通話人数など補助情報）はクライアント側で遅延取得を検討する
+
+### キャッシュ
+- `cache: 'no-store'` は本当に必要な場合のみ。リアルタイム性が低いデータには `next: { revalidate: N }` を使う
+
+---
+
 ## 注意事項
 
 - AWSなどのIaaSは使わない。マネージドサービスで完結させる
