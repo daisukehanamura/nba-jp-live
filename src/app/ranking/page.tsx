@@ -1,12 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/supabase/server'
 import { getRanking } from '@/features/auth/repository'
 import { Avatar } from '@/components/Avatar'
 
 export default async function RankingPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  const ranking = await getRanking(50)
+  const [user, ranking] = await Promise.all([
+    getUser(),
+    getRanking(50),
+  ])
 
   const medalColors: Record<number, string> = {
     1: 'text-yellow-500',

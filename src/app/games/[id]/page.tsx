@@ -10,7 +10,7 @@ import { GuestCommentView } from '@/features/comment/components/GuestCommentView
 import { PredictionPanel } from '@/features/prediction/components/PredictionPanel'
 import { VoiceRoom } from '@/features/voice/components/VoiceRoom'
 import { getPredictionSummary } from '@/features/prediction/repository'
-import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/supabase/server'
 import { XShareButton } from '@/components/XShareButton'
 
 interface GamePageProps {
@@ -20,18 +20,18 @@ interface GamePageProps {
 export default async function GamePage({ params }: GamePageProps) {
   const { id } = await params
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  const [game, initialComments, profile] = await Promise.all([
+  const [user, game, initialComments] = await Promise.all([
+    getUser(),
     getGameById(id),
     getComments(id),
-    user ? getProfile(user.id) : null,
   ])
 
   if (!game) notFound()
 
-  const predictionSummary = await getPredictionSummary(game.id, user?.id ?? null)
+  const [profile, predictionSummary] = await Promise.all([
+    user ? getProfile(user.id) : Promise.resolve(null),
+    getPredictionSummary(game.id, user?.id ?? null),
+  ])
 
   const dateStr = new Date(game.scheduledAt).toISOString().split('T')[0]
   const time = new Date(game.scheduledAt).toLocaleTimeString('ja-JP', {

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getUser, createClient } from '@/lib/supabase/server'
 import { getProfile } from '@/features/auth/repository'
 import { getUserPredictions } from '@/features/prediction/repository'
 import { ProfileEditForm } from '@/features/auth/components/ProfileEditForm'
@@ -7,11 +7,11 @@ import { LogoutButton } from '@/features/auth/components/LogoutButton'
 import { Avatar } from '@/components/Avatar'
 
 export default async function ProfilePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUser()
 
   if (!user) redirect('/auth/login')
 
+  const supabase = await createClient()
   const [profile, { data: recentComments }, predictionHistory] = await Promise.all([
     getProfile(user.id),
     supabase
