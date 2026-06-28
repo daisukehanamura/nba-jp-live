@@ -1,6 +1,8 @@
+import { Suspense } from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
 import { Header } from '@/components/Header'
+import { HeaderSkeleton } from '@/components/HeaderSkeleton'
 import { HeaderGuard } from '@/components/HeaderGuard'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import NextTopLoader from 'nextjs-toploader'
@@ -36,9 +38,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ja" className={`${geist.variable} h-full dark`}>
       <body className="min-h-full flex flex-col bg-gray-950 text-gray-100 antialiased">
         <NextTopLoader color="#f97316" height={3} showSpinner={false} />
-        <HeaderGuard>
-          <Header />
-        </HeaderGuard>
+        <Suspense fallback={<HeaderSkeleton />}>
+          <HeaderGuard>
+            <Header />
+          </HeaderGuard>
+        </Suspense>
         <div className="flex-1">{children}</div>
         <PWAInstallPrompt />
       </body>
