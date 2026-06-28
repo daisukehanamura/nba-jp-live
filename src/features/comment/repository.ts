@@ -1,4 +1,6 @@
+import { unstable_cache } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { CommentSchema, type Comment } from './schema'
 
 function parseComment(row: Record<string, unknown>): Comment | null {
@@ -22,22 +24,28 @@ function parseComment(row: Record<string, unknown>): Comment | null {
   return result.success ? result.data : null
 }
 
-export async function getCommentCounts(gameIds: string[]): Promise<Record<string, number>> {
-  if (gameIds.length === 0) return {}
-  const supabase = await createClient()
+// 60秒キャッシュ（一覧バッジ表示は多少の遅延を許容できる）
+// unstable_cache内ではcookie不要なadminClientを使う
+export const getCommentCounts = unstable_cache(
+  async (gameIds: string[]): Promise<Record<string, number>> => {
+    if (gameIds.length === 0) return {}
+    const supabase = createAdminClient()
 
-  const { data } = await supabase
-    .from('comments')
-    .select('game_id')
-    .in('game_id', gameIds)
+    const { data } = await supabase
+      .from('comments')
+      .select('game_id')
+      .in('game_id', gameIds)
 
-  if (!data) return {}
+    if (!data) return {}
 
-  return data.reduce<Record<string, number>>((acc, row) => {
-    acc[row.game_id] = (acc[row.game_id] ?? 0) + 1
-    return acc
-  }, {})
-}
+    return data.reduce<Record<string, number>>((acc, row) => {
+      acc[row.game_id] = (acc[row.game_id] ?? 0) + 1
+      return acc
+    }, {})
+  },
+  ['comment-counts'],
+  { revalidate: 60, tags: ['comment-counts'] }
+)
 
 export async function getComments(gameId: string): Promise<Comment[]> {
   const supabase = await createClient()

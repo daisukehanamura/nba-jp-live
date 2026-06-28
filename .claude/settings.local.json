@@ -7,7 +7,9 @@
       "Bash(npm install:*)",
       "Bash(npm test:*)",
       "Bash(npm run:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(/tmp/performance_analysis.txt:*)",
+      "Read(//tmp/**)"
     ]
   }
 }
