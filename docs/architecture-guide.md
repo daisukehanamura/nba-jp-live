@@ -2,6 +2,10 @@
 
 Springバックエンド経験者向けに、Next.js/Supabase構成の概念を解説する。
 
+> 言語・フレームワークそのもの（JavaScript / TypeScript / React / Next.js）を
+> 実コードで学ぶには [`learning/`](./learning/README.md) を参照。
+> 本書はアーキテクチャの全体像を担当する。
+
 ---
 
 ## 全体像
