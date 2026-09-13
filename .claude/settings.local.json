@@ -9,7 +9,9 @@
       "Bash(npm run:*)",
       "Bash(git add:*)",
       "Bash(/tmp/performance_analysis.txt:*)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(git check-ignore:*)",
+      "Bash(git log:*)"
     ]
   }
 }
